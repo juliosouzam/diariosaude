@@ -1,0 +1,13 @@
+import 'package:flutter/material.dart';
+
+class ThemeColors {
+  static const Color primary = Color.fromARGB(255, 8, 77, 110);
+  static const Color primaryVariant = Color(0xFF6200EE);
+  static const Color secondary = Color(0xFF03DAC6);
+  static const Color secondaryVariant = Color(0xFF018786);
+
+  static const Color background = Colors.white;
+  static const Color foreignground = Colors.black;
+  static const Color success = Color(0xFF03DAC6);
+  static const Color error = Color(0xFFB00020);
+}
