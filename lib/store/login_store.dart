@@ -43,8 +43,10 @@ abstract class _LoginStoreBase with Store {
 
       currentUser = Observable(user);
 
+      loggedIn = true;
       return Future.value(true);
     } catch (error) {
+      loggedIn = false;
       return Future.value(false);
     }
   }
