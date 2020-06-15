@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "404706515571",
+    "firebase_url": "https://diariosaude-55048.firebaseio.com",
+    "project_id": "diariosaude-55048",
+    "storage_bucket": "diariosaude-55048.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404706515571:android:2bd9bb060fb20c4972e806",
+        "android_client_info": {
+          "package_name": "br.com.diariosaude.diariosaude"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "404706515571-v0d7rdjvsol9c9cv97knclq9a6nbditq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.diariosaude.diariosaude",
+            "certificate_hash": "577e82c9a14b733c192ed1f112f05768561df6e5"
+          }
+        },
+        {
+          "client_id": "404706515571-8lq3pj3usvv55o1f27vt8vgk2p7r3l0f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzktvFaQgH6psmEB9R_bjqfxlQOiCar1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "404706515571-8lq3pj3usvv55o1f27vt8vgk2p7r3l0f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

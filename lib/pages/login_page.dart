@@ -1,7 +1,11 @@
+import 'package:diariosaude/store/login_store.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/components/shared/button.dart';
 import 'package:diariosaude/components/shared/input_text.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+
+final LoginStore loginStore = LoginStore();
 
 class LoginPage extends StatefulWidget {
   @override
@@ -138,15 +142,23 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            RaisedButton(
-                              child: Text(
-                                'Google',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              textColor: Colors.white,
-                              color: Color.fromRGBO(221, 75, 57, 1),
-                              onPressed: () {},
-                            ),
+                            Observer(builder: (_) {
+                              return RaisedButton(
+                                child: Text(
+                                  'Google',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                textColor: Colors.white,
+                                color: Color.fromRGBO(221, 75, 57, 1),
+                                onPressed: () {
+                                  loginStore.loginWithGoogle();
+
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (_) => HomePage()));
+                                },
+                              );
+                            }),
                             SizedBox(
                               height: 16.0,
                             ),
