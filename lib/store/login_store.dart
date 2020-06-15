@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobx/mobx.dart';
 
@@ -8,6 +9,7 @@ class LoginStore = _LoginStoreBase with _$LoginStore;
 
 abstract class _LoginStoreBase with Store {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FacebookLogin facebookLogin = new FacebookLogin();
 
   Observable<FirebaseUser> currentUser;
 
@@ -19,6 +21,9 @@ abstract class _LoginStoreBase with Store {
 
   @observable
   String photo = '';
+
+  @observable
+  bool loggedIn = false;
 
   @action
   Future<bool> loginWithGoogle() async {
@@ -43,4 +48,27 @@ abstract class _LoginStoreBase with Store {
       return Future.value(false);
     }
   }
+
+  @action
+  Future<bool> loginWithFacebook() async {
+    try{
+      final FacebookLoginResult result = await facebookLogin.logIn(['email']);
+
+      if (result.status == FacebookLoginStatus.loggedIn) {
+        final AuthCredential credential = FacebookAuthProvider.getCredential(
+            accessToken: result.accessToken.token);
+        final AuthResult authResult = await FirebaseAuth.instance.signInWithCredential(credential);
+        final FirebaseUser user = authResult.user;
+
+        currentUser = Observable(user);
+      }
+      loggedIn = true;
+      return Future.value(true);
+    }
+    catch(error){
+      loggedIn = false;
+      return Future.value(false);
+    }
+  }
+
 }

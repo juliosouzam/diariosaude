@@ -54,6 +54,21 @@ mixin _$LoginStore on _LoginStoreBase, Store {
     });
   }
 
+  final _$loggedInAtom = Atom(name: '_LoginStoreBase.loggedIn');
+
+  @override
+  bool get loggedIn {
+    _$loggedInAtom.reportRead();
+    return super.loggedIn;
+  }
+
+  @override
+  set loggedIn(bool value) {
+    _$loggedInAtom.reportWrite(value, super.loggedIn, () {
+      super.loggedIn = value;
+    });
+  }
+
   final _$loginWithGoogleAsyncAction =
       AsyncAction('_LoginStoreBase.loginWithGoogle');
 
@@ -62,12 +77,21 @@ mixin _$LoginStore on _LoginStoreBase, Store {
     return _$loginWithGoogleAsyncAction.run(() => super.loginWithGoogle());
   }
 
+  final _$loginWithFacebookAsyncAction =
+      AsyncAction('_LoginStoreBase.loginWithFacebook');
+
+  @override
+  Future<bool> loginWithFacebook() {
+    return _$loginWithFacebookAsyncAction.run(() => super.loginWithFacebook());
+  }
+
   @override
   String toString() {
     return '''
 uid: ${uid},
 name: ${name},
-photo: ${photo}
+photo: ${photo},
+loggedIn: ${loggedIn}
     ''';
   }
 }

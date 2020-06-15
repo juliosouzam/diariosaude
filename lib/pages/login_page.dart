@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/components/shared/button.dart';
 import 'package:diariosaude/components/shared/input_text.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 
 final LoginStore loginStore = LoginStore();
 
@@ -14,6 +16,21 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<ScaffoldState> _scaffolKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    reaction(
+            (_) => loginStore.loggedIn,
+            (loggedIn){
+              if(loggedIn){
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                        builder: (_) => HomePage()));
+              }
+            }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,8 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            Observer(builder: (_) {
-                              return RaisedButton(
+                              RaisedButton(
                                 child: Text(
                                   'Google',
                                   style: TextStyle(fontSize: 18),
@@ -153,24 +169,22 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: () {
                                   loginStore.loginWithGoogle();
 
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (_) => HomePage()));
                                 },
-                              );
-                            }),
+                              ),
                             SizedBox(
                               height: 16.0,
                             ),
                             RaisedButton(
-                              child: Text(
-                                'Facebook',
-                                style: TextStyle(fontSize: 18),
+                                child: Text(
+                                  'Facebook',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                textColor: Colors.white,
+                                color: Color.fromRGBO(59, 86, 157, 1),
+                                onPressed: () {
+                                  loginStore.loginWithFacebook();
+                                },
                               ),
-                              textColor: Colors.white,
-                              color: Color.fromRGBO(59, 86, 157, 1),
-                              onPressed: () {},
-                            )
                           ],
                         ),
                       ],
