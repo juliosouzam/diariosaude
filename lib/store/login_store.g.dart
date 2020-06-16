@@ -9,6 +9,13 @@ part of 'login_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$LoginStore on _LoginStoreBase, Store {
+  Computed<bool> _$isNameValidComputed;
+
+  @override
+  bool get isNameValid =>
+      (_$isNameValidComputed ??= Computed<bool>(() => super.isNameValid,
+              name: '_LoginStoreBase.isNameValid'))
+          .value;
   Computed<bool> _$isEmailValidComputed;
 
   @override
@@ -23,12 +30,26 @@ mixin _$LoginStore on _LoginStoreBase, Store {
       (_$isPasswordValidComputed ??= Computed<bool>(() => super.isPasswordValid,
               name: '_LoginStoreBase.isPasswordValid'))
           .value;
+  Computed<bool> _$isPasswordConfirmValidComputed;
+
+  @override
+  bool get isPasswordConfirmValid => (_$isPasswordConfirmValidComputed ??=
+          Computed<bool>(() => super.isPasswordConfirmValid,
+              name: '_LoginStoreBase.isPasswordConfirmValid'))
+      .value;
   Computed<Function> _$loginPressedComputed;
 
   @override
   Function get loginPressed =>
       (_$loginPressedComputed ??= Computed<Function>(() => super.loginPressed,
               name: '_LoginStoreBase.loginPressed'))
+          .value;
+  Computed<bool> _$signUpPressedComputed;
+
+  @override
+  bool get signUpPressed =>
+      (_$signUpPressedComputed ??= Computed<bool>(() => super.signUpPressed,
+              name: '_LoginStoreBase.signUpPressed'))
           .value;
   Computed<bool> _$recoverPassPressedComputed;
 
@@ -158,6 +179,21 @@ mixin _$LoginStore on _LoginStoreBase, Store {
     });
   }
 
+  final _$passwordConfirmAtom = Atom(name: '_LoginStoreBase.passwordConfirm');
+
+  @override
+  String get passwordConfirm {
+    _$passwordConfirmAtom.reportRead();
+    return super.passwordConfirm;
+  }
+
+  @override
+  set passwordConfirm(String value) {
+    _$passwordConfirmAtom.reportWrite(value, super.passwordConfirm, () {
+      super.passwordConfirm = value;
+    });
+  }
+
   final _$loginWithGoogleAsyncAction =
       AsyncAction('_LoginStoreBase.loginWithGoogle');
 
@@ -196,8 +232,28 @@ mixin _$LoginStore on _LoginStoreBase, Store {
         email: email, onSuccess: onSuccess, onFailure: onFailure));
   }
 
+  final _$signUpAsyncAction = AsyncAction('_LoginStoreBase.signUp');
+
+  @override
+  Future<bool> signUp(
+      {@required Map<String, dynamic> userData, @required String password}) {
+    return _$signUpAsyncAction
+        .run(() => super.signUp(userData: userData, password: password));
+  }
+
   final _$_LoginStoreBaseActionController =
       ActionController(name: '_LoginStoreBase');
+
+  @override
+  void setName(String value) {
+    final _$actionInfo = _$_LoginStoreBaseActionController.startAction(
+        name: '_LoginStoreBase.setName');
+    try {
+      return super.setName(value);
+    } finally {
+      _$_LoginStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setEmail(String value) {
@@ -233,6 +289,17 @@ mixin _$LoginStore on _LoginStoreBase, Store {
   }
 
   @override
+  void setPasswordConfirm(String value) {
+    final _$actionInfo = _$_LoginStoreBaseActionController.startAction(
+        name: '_LoginStoreBase.setPasswordConfirm');
+    try {
+      return super.setPasswordConfirm(value);
+    } finally {
+      _$_LoginStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 uid: ${uid},
@@ -243,9 +310,13 @@ loggedIn: ${loggedIn},
 email: ${email},
 password: ${password},
 passwordVisible: ${passwordVisible},
+passwordConfirm: ${passwordConfirm},
+isNameValid: ${isNameValid},
 isEmailValid: ${isEmailValid},
 isPasswordValid: ${isPasswordValid},
+isPasswordConfirmValid: ${isPasswordConfirmValid},
 loginPressed: ${loginPressed},
+signUpPressed: ${signUpPressed},
 recoverPassPressed: ${recoverPassPressed}
     ''';
   }

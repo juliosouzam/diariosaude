@@ -1,3 +1,4 @@
+import 'package:diariosaude/pages/signUp_page.dart';
 import 'package:diariosaude/store/login_store.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/pages/home_page.dart';
@@ -19,11 +20,10 @@ class _LoginPageState extends State<LoginPage> {
 
   ReactionDisposer disposer;
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    disposer =  reaction(
+    /*disposer =  reaction(
             (_) => loginStore.loggedIn,
             (loggedIn){
               if(loggedIn){
@@ -32,7 +32,14 @@ class _LoginPageState extends State<LoginPage> {
                         builder: (_) => HomePage()));
               }
             }
-    );
+    );*/
+    disposer = autorun((_){
+      if(loginStore.loggedIn){
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+                builder: (_) => HomePage()));
+      }
+    });
 
   }
 
@@ -159,7 +166,11 @@ class _LoginPageState extends State<LoginPage> {
                         Align(
                           alignment: Alignment.center,
                           child: FlatButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (_) => SignUpPage(loginStore: loginStore,)));
+                            },
                             child: Text(
                               "Não, tem conta? Cadastre-se",
                               textAlign: TextAlign.right,

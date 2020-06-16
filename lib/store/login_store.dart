@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
@@ -38,6 +39,12 @@ abstract class _LoginStoreBase with Store {
   @observable
   bool passwordVisible = false;
 
+  @observable
+  String passwordConfirm = "";
+
+  @action
+  void setName(String value) => name = value;
+
   @action
   void setEmail(String value) => email = value;
 
@@ -46,6 +53,12 @@ abstract class _LoginStoreBase with Store {
 
   @action
   void togglePasswordVisibility() => passwordVisible = !passwordVisible;
+
+  @action
+  void setPasswordConfirm(String value) => passwordConfirm = value;
+
+  @computed
+  bool get isNameValid => name.isNotEmpty;
 
   @computed
   bool get isEmailValid =>
@@ -56,11 +69,18 @@ abstract class _LoginStoreBase with Store {
   bool get isPasswordValid => password.length >= 6;
 
   @computed
+  bool get isPasswordConfirmValid => passwordConfirm.length >= 6 && passwordConfirm.compareTo(password) == 0;
+
+  @computed
   Function get loginPressed => (isEmailValid && isPasswordValid && !loading) ? () {
     loginWithEmailAndPassword(
         email: email,
         password: password);
   } : null;
+
+  @computed
+  bool get signUpPressed =>
+      (isNameValid && isEmailValid && isPasswordConfirmValid && !loading);
 
   @computed
   bool get recoverPassPressed => (isEmailValid && !loading);
@@ -99,17 +119,20 @@ abstract class _LoginStoreBase with Store {
     loading = true;
     try{
       final FacebookLoginResult result = await facebookLogin.logIn(['email']);
-
+      FirebaseUser user;
       if (result.status == FacebookLoginStatus.loggedIn) {
         final AuthCredential credential = FacebookAuthProvider.getCredential(
             accessToken: result.accessToken.token);
-        final AuthResult authResult = await FirebaseAuth.instance.signInWithCredential(credential);
-        final FirebaseUser user = authResult.user;
+        await FirebaseAuth.instance.signInWithCredential(credential).then((u){
+            user = u.user;
+            currentUser = Observable(user);
+            loading = false;
+            loggedIn = true;
+            return Future.value(true);
+        });
 
-        currentUser = Observable(user);
       }
-      loading = false;
-      loggedIn = true;
+
       return Future.value(true);
     }
     catch(error){
@@ -125,14 +148,16 @@ abstract class _LoginStoreBase with Store {
 
     loading = true;
     try{
-      final AuthResult authResult = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-      final FirebaseUser user = authResult.user;
+      FirebaseUser user;
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password).then((u){
+            user = u.user;
+            currentUser = Observable(user);
+            loading = false;
+            loggedIn = true;
+            return Future.value(true);
+      });
 
-      currentUser = Observable(user);
-
-      loading = false;
-      loggedIn = true;
       return Future.value(true);
     }catch(error){
       loading = false;
@@ -154,5 +179,46 @@ abstract class _LoginStoreBase with Store {
 
   }
 
-}
+  @action
+  Future<bool> signUp(
+  {@required Map<String, dynamic> userData, @required String password }) async{
+    loading = true;
+    try{
+      AuthResult authResult = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: userData["email"],
+          password: password);
 
+      FirebaseUser user = authResult.user;
+      await _saveUserData(userData, user);
+      UserUpdateInfo updateInfo = UserUpdateInfo();
+      updateInfo.displayName = userData["displayName"];
+      updateInfo.photoUrl = userData["photoUrl"];
+      await user.updateProfile(updateInfo);
+      await user.reload();
+
+      await FirebaseAuth.instance.currentUser().then((u){
+
+        currentUser = Observable(u);
+        loading = false;
+        loggedIn = true;
+      });
+
+      return Future.value(true);
+    }
+    catch(error){
+      loading = false;
+      loggedIn = false;
+      return Future.value(false);
+    }
+
+  }
+
+  Future<void> _saveUserData(Map<String, dynamic> userData, FirebaseUser user) async {
+
+    await Firestore.instance
+        .collection("users")
+        .document(user.uid)
+        .setData(userData);
+  }
+
+}
