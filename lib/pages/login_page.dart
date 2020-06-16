@@ -15,12 +15,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final GlobalKey<ScaffoldState> _scaffolKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  ReactionDisposer disposer;
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    reaction(
+    disposer =  reaction(
             (_) => loginStore.loggedIn,
             (loggedIn){
               if(loggedIn){
@@ -30,13 +33,14 @@ class _LoginPageState extends State<LoginPage> {
               }
             }
     );
+
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        key: _scaffolKey,
+        key: _scaffoldKey,
         body: SingleChildScrollView(
           child: Container(
             alignment: Alignment.center,
@@ -74,70 +78,84 @@ class _LoginPageState extends State<LoginPage> {
                             padding: const EdgeInsets.only(bottom: 10.0),
                           ),
                         ),
-                        InputText(
-                          hint: 'E-mail',
-                          prefix: Icon(Icons.account_circle),
-                          textInputType: TextInputType.emailAddress,
-                          onChanged: (text) {},
-                          enabled: true,
-                        ),
+                        Observer(builder: (_){
+                          return InputText(
+                            hint: 'E-mail',
+                            prefix: Icon(Icons.account_circle),
+                            textInputType: TextInputType.emailAddress,
+                            onChanged: loginStore.setEmail,
+                            enabled: !loginStore.loading,
+                          );
+                        }),
                         const SizedBox(
                           height: 15.0,
                         ),
-                        InputText(
-                          hint: 'Senha',
-                          prefix: Icon(Icons.lock),
-                          obscure: true,
-                          onChanged: (text) {},
-                          enabled: true,
-                          suffix: Button(
-                            radius: 32,
-                            iconData: Icons.visibility,
-                            onTap: () {},
-                          ),
-                        ),
+                        Observer(builder: (_){
+                          return InputText(
+                            hint: 'Senha',
+                            prefix: Icon(Icons.lock),
+                            obscure: !loginStore.passwordVisible,
+                            onChanged: loginStore.setPassword,
+                            enabled: !loginStore.loading,
+                            suffix: Button(
+                              radius: 32,
+                              iconData: !loginStore.passwordVisible ? Icons.visibility : Icons.visibility_off,
+                              onTap: loginStore.togglePasswordVisibility,
+                            ),
+                          );
+                        },),
                         const SizedBox(
                           height: 1,
                         ),
                         Align(
-                          alignment: Alignment.centerRight,
-                          child: FlatButton(
-                            onPressed: () {},
-                            child: Text(
-                              "Esqueci minha senha",
-                              textAlign: TextAlign.right,
+                            alignment: Alignment.centerRight,
+                            child: FlatButton(
+                              onPressed: (){
+                                if(loginStore.recoverPassPressed) {
+                                  loginStore.recoverPassword(
+                                      email: loginStore.email,
+                                      onSuccess: _onSuccessPass,
+                                      onFailure: _onFailurePass);
+                                }
+                                else{
+                                  _onFailure();
+                                }
+                              },
+                              child: Text(
+                                "Esqueci minha senha",
+                                textAlign: TextAlign.right,
+                              ),
+                              padding: EdgeInsets.zero,
                             ),
-                            padding: EdgeInsets.zero,
                           ),
-                        ),
                         const SizedBox(
                           height: 1,
                         ),
-                        SizedBox(
-                          height: 44,
-                          child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: false == true
-                                  ? Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 3.0,
-                                        valueColor: AlwaysStoppedAnimation(
-                                            Colors.white),
-                                      ),
-                                    )
-                                  : Text('Login'),
-                              color: Theme.of(context).primaryColor,
-                              disabledColor:
-                                  Theme.of(context).primaryColor.withAlpha(100),
-                              textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (context) => HomePage()));
-                              }),
-                        ),
+                        Observer(builder: (_){
+                          return SizedBox(
+                            height: 44,
+                            child: RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: loginStore.loading
+                                    ? Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3.0,
+                                    valueColor: AlwaysStoppedAnimation(
+                                        Colors.white),
+                                  ),
+                                )
+                                    : Text('Login'),
+                                color: Theme.of(context).primaryColor,
+                                disabledColor:
+                                Theme.of(context).primaryColor.withAlpha(100),
+                                textColor: Colors.white,
+                                onPressed: loginStore.loginPressed
+
+                            ),
+                          );
+                        }),
                         Align(
                           alignment: Alignment.center,
                           child: FlatButton(
@@ -197,5 +215,33 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    disposer();
+    super.dispose();
+  }
+
+  void _onSuccessPass(){
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text("Recuperação de Senha Enviado para o E-mail!"),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 2),
+    ));
+  }
+  void _onFailurePass(){
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text("Recuperação de Senha Falhou!"),
+      backgroundColor: Colors.redAccent,
+      duration: Duration(seconds: 2),
+    ));
+  }
+  void _onFailure(){
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text("Digite um email Válido!"),
+      backgroundColor: Colors.redAccent,
+      duration: Duration(seconds: 2),
+    ));
   }
 }
