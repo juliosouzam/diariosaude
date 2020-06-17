@@ -42,6 +42,9 @@ abstract class _LoginStoreBase with Store {
   @observable
   String passwordConfirm = "";
 
+  @observable
+  String dateNasc = "";
+
   @action
   void setName(String value) => name = value;
 
@@ -56,6 +59,9 @@ abstract class _LoginStoreBase with Store {
 
   @action
   void setPasswordConfirm(String value) => passwordConfirm = value;
+
+  @action
+  void setDateNasc(String value) => dateNasc = value;
 
   @computed
   bool get isNameValid => name.isNotEmpty;
@@ -72,15 +78,14 @@ abstract class _LoginStoreBase with Store {
   bool get isPasswordConfirmValid => passwordConfirm.length >= 6 && passwordConfirm.compareTo(password) == 0;
 
   @computed
+  bool get isDateNascValid => dateNasc.isNotEmpty;
+
+  @computed
   Function get loginPressed => (isEmailValid && isPasswordValid && !loading) ? () {
     loginWithEmailAndPassword(
         email: email,
         password: password);
   } : null;
-
-  @computed
-  bool get signUpPressed =>
-      (isNameValid && isEmailValid && isPasswordConfirmValid && !loading);
 
   @computed
   bool get recoverPassPressed => (isEmailValid && !loading);

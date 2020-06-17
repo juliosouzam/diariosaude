@@ -37,19 +37,19 @@ mixin _$LoginStore on _LoginStoreBase, Store {
           Computed<bool>(() => super.isPasswordConfirmValid,
               name: '_LoginStoreBase.isPasswordConfirmValid'))
       .value;
+  Computed<bool> _$isDateNascValidComputed;
+
+  @override
+  bool get isDateNascValid =>
+      (_$isDateNascValidComputed ??= Computed<bool>(() => super.isDateNascValid,
+              name: '_LoginStoreBase.isDateNascValid'))
+          .value;
   Computed<Function> _$loginPressedComputed;
 
   @override
   Function get loginPressed =>
       (_$loginPressedComputed ??= Computed<Function>(() => super.loginPressed,
               name: '_LoginStoreBase.loginPressed'))
-          .value;
-  Computed<bool> _$signUpPressedComputed;
-
-  @override
-  bool get signUpPressed =>
-      (_$signUpPressedComputed ??= Computed<bool>(() => super.signUpPressed,
-              name: '_LoginStoreBase.signUpPressed'))
           .value;
   Computed<bool> _$recoverPassPressedComputed;
 
@@ -194,6 +194,21 @@ mixin _$LoginStore on _LoginStoreBase, Store {
     });
   }
 
+  final _$dateNascAtom = Atom(name: '_LoginStoreBase.dateNasc');
+
+  @override
+  String get dateNasc {
+    _$dateNascAtom.reportRead();
+    return super.dateNasc;
+  }
+
+  @override
+  set dateNasc(String value) {
+    _$dateNascAtom.reportWrite(value, super.dateNasc, () {
+      super.dateNasc = value;
+    });
+  }
+
   final _$loginWithGoogleAsyncAction =
       AsyncAction('_LoginStoreBase.loginWithGoogle');
 
@@ -300,6 +315,17 @@ mixin _$LoginStore on _LoginStoreBase, Store {
   }
 
   @override
+  void setDateNasc(String value) {
+    final _$actionInfo = _$_LoginStoreBaseActionController.startAction(
+        name: '_LoginStoreBase.setDateNasc');
+    try {
+      return super.setDateNasc(value);
+    } finally {
+      _$_LoginStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 uid: ${uid},
@@ -311,12 +337,13 @@ email: ${email},
 password: ${password},
 passwordVisible: ${passwordVisible},
 passwordConfirm: ${passwordConfirm},
+dateNasc: ${dateNasc},
 isNameValid: ${isNameValid},
 isEmailValid: ${isEmailValid},
 isPasswordValid: ${isPasswordValid},
 isPasswordConfirmValid: ${isPasswordConfirmValid},
+isDateNascValid: ${isDateNascValid},
 loginPressed: ${loginPressed},
-signUpPressed: ${signUpPressed},
 recoverPassPressed: ${recoverPassPressed}
     ''';
   }
