@@ -12,7 +12,7 @@ class LoginStore = _LoginStoreBase with _$LoginStore;
 abstract class _LoginStoreBase with Store {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FacebookLogin facebookLogin = new FacebookLogin();
-
+  Map<String, dynamic> userData = Map();
   Observable<FirebaseUser> currentUser;
 
   @observable
@@ -66,6 +66,7 @@ abstract class _LoginStoreBase with Store {
   @computed
   bool get isNameValid => name.isNotEmpty;
 
+
   @computed
   bool get isEmailValid =>
       RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
@@ -89,6 +90,16 @@ abstract class _LoginStoreBase with Store {
 
   @computed
   bool get recoverPassPressed => (isEmailValid && !loading);
+
+  @action
+  Future<void> isLoggedIn() async {
+    await FirebaseAuth.instance.currentUser().then((u){
+      if(u != null && loggedIn == false){
+        currentUser = Observable(u);
+        loggedIn = true;
+      }
+    });
+  }
 
   @action
   Future<bool> loginWithGoogle() async {
@@ -219,11 +230,21 @@ abstract class _LoginStoreBase with Store {
   }
 
   Future<void> _saveUserData(Map<String, dynamic> userData, FirebaseUser user) async {
-
+    this.userData = userData;
     await Firestore.instance
         .collection("users")
         .document(user.uid)
         .setData(userData);
+  }
+
+  Future<void> signOut() async{
+    await FirebaseAuth.instance.signOut().then((u){
+      currentUser = null;
+      userData = Map();
+      loggedIn = false;
+      setEmail("");
+      setPassword("");
+    });
   }
 
 }

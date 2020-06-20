@@ -33,50 +33,11 @@ class _SignUpPageState extends State<SignUpPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final LoginStore loginStore;
 
-  _SignUpPageState(this.loginStore){
-    loadData();
-  }
+  _SignUpPageState(this.loginStore);
   final format = DateFormat("dd-MM-yyyy");
   final _dateNasciController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String typeBlood;
 
-  List<DropdownMenuItem<String>> listDrop = [];
-
-  void loadData() {
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo A+"),
-      value: 'tipoA+',
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo A-"),
-      value: 'tipoA-',
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo B+"),
-      value: 'tipoB+',
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo B-"),
-      value: 'tipoB-',
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo AB+"),
-      value: 'tipoAB+',
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo AB-"),
-      value: 'tipoAB-',
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo O+"),
-      value: 'tipoO+',
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text("Tipo O-"),
-      value: 'tipo0-',
-    ));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,28 +189,6 @@ class _SignUpPageState extends State<SignUpPage> {
                           const SizedBox(
                             height: 15.0,
                           ),
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              value: typeBlood,
-                              items: listDrop,
-                              hint: Text(
-                                "Tipo Sanguíneo",
-                                style: TextStyle(fontSize: 14.0),
-                              ),
-                              elevation: 0,
-                              onChanged: (value) {
-                                setState(() {
-                                  typeBlood = value;
-                                });
-                              },
-                              style:
-                                  TextStyle(fontSize: 14.0, color: Colors.black),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 15.0,
-                          ),
-
                           DateTimeField(
                               controller: _dateNasciController,
                               format: format,
@@ -307,8 +246,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                         "displayName": loginStore.name,
                                         "email": loginStore.email,
                                         "date_nasc": loginStore.dateNasc,
-                                        "type_blood": typeBlood,
-                                        "photoUrl": "http://www.mds.gov.br/webarquivos/arquivo/mds_pra_vc/botoes/Carta_de_Servi%C3%A7o__200x200_CIDADAO.png",
+                                        "photoUrl": "semFoto",
                                       };
                                       loginStore.signUp(
                                           userData: userData,

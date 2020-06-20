@@ -1,5 +1,6 @@
 import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
+import 'package:diariosaude/store/login_store.dart';
 import 'package:diariosaude/widgets/child_column.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +12,14 @@ import 'package:diariosaude/widgets/top_container.dart';
 // final LoginStore loginStore = LoginStore();
 
 class HomePage extends StatefulWidget {
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+
+
   Text subheading(String title) {
     return Text(
       title,
@@ -73,9 +77,12 @@ class _HomePageState extends State<HomePage> {
                           Container(),
                           IconButton(
                             onPressed: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) => LoginPage()));
+                              loginStore.signOut();
+                              if(!loginStore.loggedIn){
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (_) => LoginPage()));
+                              }
                             },
                             icon: Icon(Icons.exit_to_app,
                                 color: Colors.white, size: 25.0),
@@ -101,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                                 backgroundColor: ThemeColors.primaryVariant,
                                 radius: 35.0,
                                 backgroundImage:
-                                    loginStore.currentUser.value != null
+                                    loginStore.currentUser.value.photoUrl.compareTo("semFoto") != 0
                                         ? Image.network(loginStore
                                                 .currentUser.value.photoUrl)
                                             .image

@@ -209,6 +209,13 @@ mixin _$LoginStore on _LoginStoreBase, Store {
     });
   }
 
+  final _$isLoggedInAsyncAction = AsyncAction('_LoginStoreBase.isLoggedIn');
+
+  @override
+  Future<void> isLoggedIn() {
+    return _$isLoggedInAsyncAction.run(() => super.isLoggedIn());
+  }
+
   final _$loginWithGoogleAsyncAction =
       AsyncAction('_LoginStoreBase.loginWithGoogle');
 

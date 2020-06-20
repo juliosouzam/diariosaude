@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/components/shared/button.dart';
 import 'package:diariosaude/components/shared/input_text.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 
@@ -34,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
             }
     );*/
     disposer = autorun((_){
+      loginStore.isLoggedIn();
       if(loginStore.loggedIn){
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(
