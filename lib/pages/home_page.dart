@@ -1,6 +1,6 @@
 import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
-import 'package:diariosaude/store/login_store.dart';
+import 'package:diariosaude/store/child_store.dart';
 import 'package:diariosaude/widgets/child_column.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:flutter/material.dart';
@@ -9,16 +9,13 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 
-// final LoginStore loginStore = LoginStore();
-
 class HomePage extends StatefulWidget {
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-
+  final ChildStore childStore = ChildStore();
 
   Text subheading(String title) {
     return Text(
@@ -78,7 +75,7 @@ class _HomePageState extends State<HomePage> {
                           IconButton(
                             onPressed: () {
                               loginStore.signOut();
-                              if(!loginStore.loggedIn){
+                              if (!loginStore.loggedIn) {
                                 Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
                                         builder: (_) => LoginPage()));
@@ -107,14 +104,16 @@ class _HomePageState extends State<HomePage> {
                               center: CircleAvatar(
                                 backgroundColor: ThemeColors.primaryVariant,
                                 radius: 35.0,
-                                backgroundImage:
-                                    loginStore.currentUser.value.photoUrl.compareTo("semFoto") != 0
-                                        ? Image.network(loginStore
-                                                .currentUser.value.photoUrl)
-                                            .image
-                                        : AssetImage(
-                                            'assets/images/avatar.png',
-                                          ),
+                                backgroundImage: loginStore
+                                            .currentUser.value.photoUrl
+                                            .compareTo("semFoto") !=
+                                        0
+                                    ? Image.network(loginStore
+                                            .currentUser.value.photoUrl)
+                                        .image
+                                    : AssetImage(
+                                        'assets/images/avatar.png',
+                                      ),
                               ),
                             ),
                             Column(
@@ -153,30 +152,32 @@ class _HomePageState extends State<HomePage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        color: Colors.transparent,
+                      Padding(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            subheading('Meus filhos'),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AddChildPage()),
+                                );
+                              },
+                              child: addIcon(),
+                            ),
+                          ],
+                        ),
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
+                      ),
+                      Container(
+                        color: Colors.transparent,
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
                         child: Column(
                           children: <Widget>[
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                subheading('Meus filhos'),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => AddChildPage()),
-                                    );
-                                  },
-                                  child: addIcon(),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 15.0),
                             ChildColum(
                               icon: Icons.alarm,
                               iconBackgroundColor: ThemeColors.error,

@@ -197,7 +197,6 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Color.fromRGBO(221, 75, 57, 1),
                                 onPressed: () {
                                   loginStore.loginWithGoogle();
-
                                 },
                               ),
                             SizedBox(
