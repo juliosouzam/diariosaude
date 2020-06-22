@@ -3,14 +3,16 @@ import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ChildDetailPage extends StatefulWidget {
   final String name;
   final String age;
   final String image;
+  final String cId; // child id
 
-  const ChildDetailPage({Key key, this.name, this.age, this.image})
+  const ChildDetailPage({Key key, this.name, this.age, this.image, this.cId})
       : super(key: key);
 
   @override
@@ -146,31 +148,27 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              CreateNewTaskPage()));
+                                              CreateNewTaskPage(widget.cId)));
                                 },
                                 child: calendarIcon(),
                               ),
                             ],
                           ),
-                          SizedBox(height: 5.0),
-                          TaskContainer(
-                            title: 'Vacina',
-                            subtitle:
-                                'Dia 01 de junho, dia da vacina do Antônio Felipe',
-                            boxColor: Color.fromARGB(255, 185, 232, 234),
-                          ),
-                          TaskContainer(
-                            title: 'Pediatra',
-                            subtitle:
-                                'Dia 15 de julho, levar a Angelica Silva à pediatra',
-                            boxColor: Color.fromARGB(255, 185, 232, 234),
-                          ),
-                          TaskContainer(
-                            title: 'Consulta médica',
-                            subtitle:
-                                'Dia 28 de maio, levar Fernanda Souza para a consulta médica',
-                            boxColor: Color.fromARGB(255, 185, 232, 234),
-                          ),
+                          Observer(builder: (_){
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: eventStore.listEventFilter.map((event){
+                                return TaskContainer(
+                                      title: event.nameEvent,
+                                      subtitle: event.dateEvent.day.toString() + "-" +
+                                                event.dateEvent.month.toString() +"-" +
+                                                event.dateEvent.year.toString() + "  " +
+                                                event.descriptionEvent,
+                                      boxColor: Color.fromARGB(255, 185, 232, 234),
+                                    );
+                              }).toList(),
+                            );
+                          }),
                         ],
                       ),
                     ),

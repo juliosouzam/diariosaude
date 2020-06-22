@@ -32,8 +32,7 @@ class _AddChildPageState extends State<AddChildPage> {
       key: _scaffoldKey,
       backgroundColor: ThemeColors.background,
       body: SafeArea(
-        child: Observer(builder: (_) {
-          return Column(
+        child:  Column(
             children: <Widget>[
               TopContainer(
                 padding: EdgeInsets.all(20),
@@ -227,8 +226,7 @@ class _AddChildPageState extends State<AddChildPage> {
                     Navigator.pop(context);
                   }),
             ],
-          );
-        }),
+          ),
       ),
     );
   }

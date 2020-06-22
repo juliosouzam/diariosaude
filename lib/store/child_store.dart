@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diariosaude/data/child_data.dart';
 import 'package:diariosaude/store/login_store.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:mobx/mobx.dart';
@@ -32,6 +33,9 @@ abstract class _ChildStoreBase with Store {
   @observable
   File photo;
 
+  ObservableList<ChildData> listChild = ObservableList<ChildData>();
+
+
   @computed
   bool get isFormValid =>
       name != null &&
@@ -45,13 +49,13 @@ abstract class _ChildStoreBase with Store {
 
   @action
   Future<void> addChild() async {
-    Map<String, dynamic> data = {
-      'name': name,
-      'dateBirth': dateBirth,
-      'hourBirth': hourBirth,
-      'weight': weight,
-      'height': height,
-    };
+    ChildData data = ChildData();
+    data.name = name;
+    data.dateBirth = dateBirth;
+    data.hourBirth = hourBirth;
+    data.weight = weight;
+    data.height = height;
+    data.userId = parentId;
 
     StorageUploadTask task = FirebaseStorage.instance
         .ref()
@@ -60,22 +64,31 @@ abstract class _ChildStoreBase with Store {
 
     StorageTaskSnapshot taskSnapshot = await task.onComplete;
     String url = await taskSnapshot.ref.getDownloadURL();
-    data['photo'] = url;
+    data.photo = url;
 
     await Firestore.instance
         .collection("users")
         .document(parentId)
         .collection("children")
-        .add(data);
+        .add(data.toMap());
+
+
+    name="";
+    dateBirth = null;
+    hourBirth = null;
+    weight = "";
+    height = "";
+    photo = null;
   }
 
-  Future getChildren() async {
+  Future getChildren(String uId) async {
     QuerySnapshot query = await Firestore.instance
         .collection("users")
-        .document(_loginStore.currentUser.value.uid)
+        .document(uId)
         .collection("children")
         .getDocuments();
 
-    print(query.documents);
+    listChild = query.documents.map((doc) => ChildData.fromDocument(doc)).toList().asObservable();
+
   }
 }

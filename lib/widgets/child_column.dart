@@ -7,13 +7,14 @@ class ChildColum extends StatelessWidget {
   final String name;
   final String age;
   final String image;
-
+  final String cId;
   ChildColum({
     this.icon,
     this.iconBackgroundColor,
     this.name,
     this.age,
-    this.image = 'https://cdn.mindful.org/YesBrain.jpg',
+    this.image,
+    this.cId,
   });
 
   @override
@@ -25,6 +26,7 @@ class ChildColum extends StatelessWidget {
                   name: name,
                   age: age,
                   image: image,
+                  cId: cId,
                 )));
       },
       title: Text(name),

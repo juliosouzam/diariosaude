@@ -6,6 +6,7 @@ import 'package:diariosaude/widgets/task_container.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 
@@ -17,6 +18,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ChildStore childStore = ChildStore();
 
+  ReactionDisposer disposer;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    disposer = autorun((_){
+      childStore.getChildren(loginStore.currentUser.value.uid);
+    });
+
+  }
   Text subheading(String title) {
     return Text(
       title,
@@ -173,36 +184,23 @@ class _HomePageState extends State<HomePage> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
                       ),
-                      Container(
-                        color: Colors.transparent,
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Column(
-                          children: <Widget>[
-                            ChildColum(
-                              icon: Icons.alarm,
-                              iconBackgroundColor: ThemeColors.error,
-                              name: 'Angelica Silva',
-                              age: '1 ano e 5 meses',
-                            ),
-                            SizedBox(
-                              height: 15.0,
-                            ),
-                            ChildColum(
-                              icon: Icons.blur_circular,
-                              iconBackgroundColor: ThemeColors.primaryVariant,
-                              name: 'Antônio Felipe',
-                              age: '3 anos e 4 meses',
-                            ),
-                            SizedBox(height: 15.0),
-                            ChildColum(
-                              icon: Icons.check_circle_outline,
-                              iconBackgroundColor: ThemeColors.primary,
-                              name: 'Fernanda Souza',
-                              age: '14 anos',
-                            ),
-                          ],
-                        ),
-                      ),
+                      Observer(builder: (_){
+                        return Column(
+                            children: childStore.listChild.map((child){
+                              return Card(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 0.0, vertical: 4.0),
+                                  child: ChildColum(
+                                    icon: Icons.blur_circular,
+                                    iconBackgroundColor: ThemeColors.primaryVariant,
+                                    name: child.name,
+                                    age: _calculaIdade(DateTime.now(), child.dateBirth),
+                                    image: child.photo,
+                                    cId: child.cid,
+                                  ));
+                            }).toList(),
+                          );
+                      }),
                       Container(
                         color: Colors.transparent,
                         padding: EdgeInsets.symmetric(
@@ -243,4 +241,54 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    disposer();
+    super.dispose();
+  }
+}
+
+String _calculaIdade(DateTime data, DateTime nasc){
+
+  int dia; int ano; int mes;
+  String idade;
+
+  ano = data.year - nasc.year;
+  mes = data.month - nasc.month;
+  dia = data.day - nasc.day;
+
+  if(dia<0){
+    mes = mes -1;
+    dia = 30 + dia;
+  }
+  if(mes<0){
+    ano = ano -1;
+    mes = 12 + mes;
+  }
+  if(ano == 0){
+    if(mes == 0){
+      idade = dia.toString() + " Dias";
+    }else {
+      idade = mes.toString() + " Mês e " + dia.toString() + " Dias";
+    }
+  }else if(ano == 1){
+    if(mes == 1){
+      idade = ano.toString() + " Ano, " + mes.toString() + " Mês e " + dia.toString() +
+          " Dias.";
+    }else{
+      idade = ano.toString() + " Ano, " + mes.toString() + " Meses e " + dia.toString() +
+          " Dias.";
+    }
+  }else{
+    if(mes == 1){
+      idade = ano.toString() + " Anos, " + mes.toString() + " Mês e " + dia.toString() +
+          " Dias.";
+    }else{
+      idade = ano.toString() + " Anos, " + mes.toString() + " Meses e " + dia.toString() +
+          " Dias.";
+    }
+  }
+
+  return idade;
 }
