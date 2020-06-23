@@ -10,8 +10,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 
 final LoginStore loginStore = LoginStore();
-final ChildStore childStore = ChildStore();
-final EventStore eventStore = EventStore();
+
 
 class LoginPage extends StatefulWidget {
   @override

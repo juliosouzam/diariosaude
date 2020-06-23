@@ -9,6 +9,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
+final EventStore eventStore = EventStore();
 
 class ChildDetailPage extends StatefulWidget {
   final String name;

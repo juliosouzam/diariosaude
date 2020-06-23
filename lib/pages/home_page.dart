@@ -10,6 +10,8 @@ import 'package:mobx/mobx.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 
+final ChildStore childStore = ChildStore();
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
