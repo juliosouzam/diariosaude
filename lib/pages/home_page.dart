@@ -16,10 +16,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ChildStore childStore = ChildStore();
 
   ReactionDisposer disposer;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

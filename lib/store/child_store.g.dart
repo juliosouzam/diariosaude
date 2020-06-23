@@ -122,10 +122,40 @@ mixin _$ChildStore on _ChildStoreBase, Store {
     });
   }
 
+  final _$listChildAtom = Atom(name: '_ChildStoreBase.listChild');
+
+  @override
+  ObservableList<ChildData> get listChild {
+    _$listChildAtom.reportRead();
+    return super.listChild;
+  }
+
+  @override
+  set listChild(ObservableList<ChildData> value) {
+    _$listChildAtom.reportWrite(value, super.listChild, () {
+      super.listChild = value;
+    });
+  }
+
+  final _$addFilhoAtom = Atom(name: '_ChildStoreBase.addFilho');
+
+  @override
+  bool get addFilho {
+    _$addFilhoAtom.reportRead();
+    return super.addFilho;
+  }
+
+  @override
+  set addFilho(bool value) {
+    _$addFilhoAtom.reportWrite(value, super.addFilho, () {
+      super.addFilho = value;
+    });
+  }
+
   final _$addChildAsyncAction = AsyncAction('_ChildStoreBase.addChild');
 
   @override
-  Future<void> addChild() {
+  Future<bool> addChild() {
     return _$addChildAsyncAction.run(() => super.addChild());
   }
 
@@ -139,6 +169,8 @@ hourBirth: ${hourBirth},
 weight: ${weight},
 height: ${height},
 photo: ${photo},
+listChild: ${listChild},
+addFilho: ${addFilho},
 isFormValid: ${isFormValid}
     ''';
   }

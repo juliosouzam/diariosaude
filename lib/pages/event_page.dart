@@ -1,4 +1,5 @@
 import 'package:diariosaude/data/event_data.dart';
+import 'package:diariosaude/pages/child_detail_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/event_store.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,6 @@ import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:mobx/mobx.dart';
 
-final EventStore eventStore = EventStore();
 
 class CreateNewTaskPage extends StatefulWidget {
   final String cId;
@@ -39,16 +39,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
     eventStore.seTipoEvent(true, "");
     super.initState();
   }
-  ReactionDisposer disposer;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    disposer = autorun((_){
-      eventStore.getEventos(loginStore.currentUser.value.uid, cid);
-    });
-
-  }
 
 
   @override
@@ -260,11 +251,11 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                           eventData.nameEvent = eventStore.nomeEvent;
                           eventData.dateEvent = eventStore.dateEvent;
                           eventData.horarioEvent = eventStore.horarioEvent;
-                          eventData.descriptionEvent =
-                              eventStore.descricaoEvent;
+                          eventData.descriptionEvent = eventStore.descricaoEvent;
                           eventData.typeEvent = eventStore.tipoEvent;
+
                           bool result = false;
-                          result  = await eventStore.addEventData(eventData,
+                          result = await eventStore.addEventData(eventData,
                                       loginStore.currentUser.value.uid, cid);
                           if(result){
                             _onSuccess();
@@ -310,11 +301,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
       ),
     );
   }
-  @override
-  void dispose() {
-    _horarioController.dispose();
-    super.dispose();
-  }
+
   void _onSuccess() {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text("Evento Criado com Sucesso!"),

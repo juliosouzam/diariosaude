@@ -1,10 +1,14 @@
 import 'package:diariosaude/pages/event_page.dart';
+import 'package:diariosaude/pages/login_page.dart';
+import 'package:diariosaude/store/event_store.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+
 
 class ChildDetailPage extends StatefulWidget {
   final String name;
@@ -16,10 +20,24 @@ class ChildDetailPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ChildDetailPageState createState() => _ChildDetailPageState();
+  _ChildDetailPageState createState() => _ChildDetailPageState(cId);
 }
 
 class _ChildDetailPageState extends State<ChildDetailPage> {
+
+  String cId;
+  _ChildDetailPageState(this.cId);
+  ReactionDisposer disposer;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    disposer = autorun((_) {
+      eventStore.getEventos(loginStore.currentUser.value.uid, cId);
+    });
+
+  }
+
   Text subheading(String title) {
     return Text(
       title,
@@ -148,13 +166,14 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              CreateNewTaskPage(widget.cId)));
+                                              CreateNewTaskPage(cId)));
                                 },
                                 child: calendarIcon(),
                               ),
                             ],
                           ),
                           Observer(builder: (_){
+
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: eventStore.listEventFilter.map((event){
@@ -180,5 +199,10 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    disposer();
+    super.dispose();
   }
 }

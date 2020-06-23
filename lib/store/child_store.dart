@@ -33,8 +33,11 @@ abstract class _ChildStoreBase with Store {
   @observable
   File photo;
 
+  @observable
   ObservableList<ChildData> listChild = ObservableList<ChildData>();
 
+  @observable
+  bool addFilho = false;
 
   @computed
   bool get isFormValid =>
@@ -48,37 +51,45 @@ abstract class _ChildStoreBase with Store {
 
 
   @action
-  Future<void> addChild() async {
-    ChildData data = ChildData();
-    data.name = name;
-    data.dateBirth = dateBirth;
-    data.hourBirth = hourBirth;
-    data.weight = weight;
-    data.height = height;
-    data.userId = parentId;
+  Future<bool> addChild() async {
+    try{
+      ChildData data = ChildData();
+      data.name = name;
+      data.dateBirth = dateBirth;
+      data.hourBirth = hourBirth;
+      data.weight = weight;
+      data.height = height;
+      data.userId = parentId;
 
-    StorageUploadTask task = FirebaseStorage.instance
-        .ref()
-        .child(DateTime.now().millisecondsSinceEpoch.toString())
-        .putFile(photo);
+      StorageUploadTask task = FirebaseStorage.instance
+          .ref()
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
+          .putFile(photo);
 
-    StorageTaskSnapshot taskSnapshot = await task.onComplete;
-    String url = await taskSnapshot.ref.getDownloadURL();
-    data.photo = url;
+      StorageTaskSnapshot taskSnapshot = await task.onComplete;
+      String url = await taskSnapshot.ref.getDownloadURL();
+      data.photo = url;
 
-    await Firestore.instance
-        .collection("users")
-        .document(parentId)
-        .collection("children")
-        .add(data.toMap());
+      listChild.add(data);
+
+      await Firestore.instance
+          .collection("users")
+          .document(parentId)
+          .collection("children")
+          .add(data.toMap());
 
 
-    name="";
-    dateBirth = null;
-    hourBirth = null;
-    weight = "";
-    height = "";
-    photo = null;
+      name = "";
+      dateBirth = null;
+      hourBirth = null;
+      weight = "";
+      height = "";
+      photo = null;
+      return true;
+    }catch(error){
+      return false;
+    }
+
   }
 
   Future getChildren(String uId) async {

@@ -120,6 +120,36 @@ mixin _$EventStore on _EventStoreBase, Store {
     });
   }
 
+  final _$listEventAtom = Atom(name: '_EventStoreBase.listEvent');
+
+  @override
+  ObservableList<EventData> get listEvent {
+    _$listEventAtom.reportRead();
+    return super.listEvent;
+  }
+
+  @override
+  set listEvent(ObservableList<EventData> value) {
+    _$listEventAtom.reportWrite(value, super.listEvent, () {
+      super.listEvent = value;
+    });
+  }
+
+  final _$listEventFilterAtom = Atom(name: '_EventStoreBase.listEventFilter');
+
+  @override
+  ObservableList<EventData> get listEventFilter {
+    _$listEventFilterAtom.reportRead();
+    return super.listEventFilter;
+  }
+
+  @override
+  set listEventFilter(ObservableList<EventData> value) {
+    _$listEventFilterAtom.reportWrite(value, super.listEventFilter, () {
+      super.listEventFilter = value;
+    });
+  }
+
   final _$loadingAtom = Atom(name: '_EventStoreBase.loading');
 
   @override
@@ -208,6 +238,8 @@ dateEvent: ${dateEvent},
 horarioEvent: ${horarioEvent},
 descricaoEvent: ${descricaoEvent},
 tipoEvent: ${tipoEvent},
+listEvent: ${listEvent},
+listEventFilter: ${listEventFilter},
 loading: ${loading},
 isNomeValid: ${isNomeValid},
 isDateValid: ${isDateValid},

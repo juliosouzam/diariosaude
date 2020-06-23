@@ -23,8 +23,10 @@ abstract class _EventStoreBase with Store {
   @observable
   String tipoEvent = "";
 
+  @observable
   ObservableList<EventData> listEvent = ObservableList<EventData>();
 
+  @observable
   ObservableList<EventData> listEventFilter = ObservableList<EventData>();
 
   @observable
@@ -65,9 +67,9 @@ abstract class _EventStoreBase with Store {
 
   @action
   Future<bool> addEventData(EventData e, String uId, String cId) async{
-    listEvent.add(e);
     loading = true;
     try{
+      listEvent.add(e);
       await Firestore.instance
           .collection("users")
           .document(uId)
@@ -80,6 +82,7 @@ abstract class _EventStoreBase with Store {
          print(e);
       });
       loading = false;
+
       return true;
     } catch(error){
       loading = false;
@@ -88,22 +91,28 @@ abstract class _EventStoreBase with Store {
 
   }
 
-  Future getEventos(String uId, String cId) async {
-    QuerySnapshot query = await Firestore.instance
-        .collection("users")
-        .document(uId)
-        .collection("children")
-        .document(cId)
-        .collection("eventos")
-        .getDocuments();
+  Future<bool> getEventos(String uId, String cId) async {
+    try{
+      QuerySnapshot query = await Firestore.instance
+          .collection("users")
+          .document(uId)
+          .collection("children")
+          .document(cId)
+          .collection("eventos")
+          .getDocuments();
 
-    listEvent = query.documents.map((doc) => EventData.fromDocument(doc)).toList().asObservable();
-    listEventFilter = listEvent;
-    DateTime data = DateTime.now();
-    listEventFilter = listEventFilter.where((filter) => filter.dateEvent.isAfter(DateTime.now()) ||
-        (filter.dateEvent.month == data.month
-        && filter.dateEvent.day == data.day
-        && filter.dateEvent.year == data.year) ).toList().asObservable();
+      listEvent = query.documents.map((doc) => EventData.fromDocument(doc)).toList().asObservable();
+      listEventFilter = listEvent;
+      DateTime data = DateTime.now();
+      listEventFilter = listEventFilter.where((filter) => filter.dateEvent.isAfter(DateTime.now()) ||
+          (filter.dateEvent.month == data.month
+              && filter.dateEvent.day == data.day
+              && filter.dateEvent.year == data.year) ).toList().asObservable();
+      return true;
+    }catch(error){
+      return false;
+    }
+
   }
 
 

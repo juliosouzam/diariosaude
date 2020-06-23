@@ -1,4 +1,6 @@
 import 'package:diariosaude/pages/signUp_page.dart';
+import 'package:diariosaude/store/child_store.dart';
+import 'package:diariosaude/store/event_store.dart';
 import 'package:diariosaude/store/login_store.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/pages/home_page.dart';
@@ -8,6 +10,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 
 final LoginStore loginStore = LoginStore();
+final ChildStore childStore = ChildStore();
+final EventStore eventStore = EventStore();
 
 class LoginPage extends StatefulWidget {
   @override

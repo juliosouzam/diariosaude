@@ -210,7 +210,7 @@ class _AddChildPageState extends State<AddChildPage> {
                   color: Theme.of(context).primaryColor,
                   disabledColor: Theme.of(context).primaryColor.withAlpha(100),
                   textColor: Colors.white,
-                  onPressed: () {
+                  onPressed: () async {
                     childStore.parentId = loginStore.currentUser.value.uid;
                     if (!childStore.isFormValid) {
                       _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -221,7 +221,7 @@ class _AddChildPageState extends State<AddChildPage> {
                       return;
                     }
 
-                    childStore.addChild();
+                    await childStore.addChild();
 
                     Navigator.pop(context);
                   }),
