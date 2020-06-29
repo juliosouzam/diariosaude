@@ -1,6 +1,7 @@
 import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/child_store.dart';
+import 'package:diariosaude/store/user_store.dart';
 import 'package:diariosaude/widgets/child_column.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:flutter/material.dart';
@@ -112,19 +113,22 @@ class _HomePageState extends State<HomePage> {
                               circularStrokeCap: CircularStrokeCap.round,
                               progressColor: ThemeColors.secondary,
                               backgroundColor: ThemeColors.primary,
-                              center: CircleAvatar(
-                                backgroundColor: ThemeColors.primaryVariant,
-                                radius: 35.0,
-                                backgroundImage: loginStore
-                                            .currentUser.value.photoUrl
-                                            .compareTo("semFoto") !=
-                                        0
-                                    ? Image.network(loginStore
-                                            .currentUser.value.photoUrl)
-                                        .image
-                                    : AssetImage(
-                                        'assets/images/avatar.png',
-                                      ),
+                              center: GestureDetector(
+                                onTap: (){},
+                                child: CircleAvatar(
+                                  backgroundColor: ThemeColors.primaryVariant,
+                                  radius: 35.0,
+                                  backgroundImage: loginStore
+                                              .currentUser.value.photoUrl
+                                              .compareTo("semFoto") !=
+                                          0
+                                      ? Image.network(loginStore
+                                              .currentUser.value.photoUrl)
+                                          .image
+                                      : AssetImage(
+                                          'assets/images/avatar.png',
+                                        ),
+                                ),
                               ),
                             ),
                             Column(

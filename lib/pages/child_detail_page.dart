@@ -1,4 +1,8 @@
+import 'package:diariosaude/data/child_data.dart';
+import 'package:diariosaude/pages/child_profile_page.dart';
+import 'package:diariosaude/pages/event_detail_page.dart';
 import 'package:diariosaude/pages/event_page.dart';
+import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/event_store.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
@@ -21,20 +25,19 @@ class ChildDetailPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ChildDetailPageState createState() => _ChildDetailPageState(cId);
+  _ChildDetailPageState createState() => _ChildDetailPageState();
 }
 
 class _ChildDetailPageState extends State<ChildDetailPage> {
 
-  String cId;
-  _ChildDetailPageState(this.cId);
+  _ChildDetailPageState();
   ReactionDisposer disposer;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     disposer = autorun((_) {
-      eventStore.getEventos(loginStore.currentUser.value.uid, cId);
+      eventStore.getEventos(loginStore.currentUser.value.uid, widget.cId);
     });
 
   }
@@ -106,10 +109,17 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                             progressColor: ThemeColors.secondary,
                             backgroundColor: ThemeColors.primary,
                             center: Hero(
-                                child: CircleAvatar(
-                                  backgroundColor: ThemeColors.primaryVariant,
-                                  radius: 35.0,
-                                  backgroundImage: NetworkImage(widget.image),
+                                child: GestureDetector(
+                                  onTap: (){
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) => ChildProfilePage(widget.cId)));
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundColor: ThemeColors.primaryVariant,
+                                    radius: 35.0,
+                                    backgroundImage: NetworkImage(widget.image),
+                                  ),
                                 ),
                                 tag: widget.name),
                           ),
@@ -167,25 +177,34 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              CreateNewTaskPage(cId)));
+                                              CreateNewTaskPage(widget.cId)));
                                 },
                                 child: calendarIcon(),
                               ),
                             ],
                           ),
                           Observer(builder: (_){
-
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: eventStore.listEventFilter.map((event){
-                                return TaskContainer(
-                                      title: event.nameEvent,
-                                      subtitle: event.dateEvent.day.toString() + "-" +
-                                                event.dateEvent.month.toString() +"-" +
-                                                event.dateEvent.year.toString() + "  " +
-                                                event.descriptionEvent,
-                                      boxColor: Color.fromARGB(255, 185, 232, 234),
-                                    );
+                                return GestureDetector(
+                                  onTap: (){
+                                    ChildData c = ChildData();
+                                    c.photo = widget.image;
+                                    c.cid = widget.cId;
+                                    c.name = widget.name;
+                                    Navigator.push(context, MaterialPageRoute(
+                                            builder: (context) => EventDetailPage(event, c)));
+                                  },
+                                  child: TaskContainer(
+                                        title: event.nameEvent,
+                                        subtitle: event.dateEvent.day.toString() + "-" +
+                                                  event.dateEvent.month.toString() +"-" +
+                                                  event.dateEvent.year.toString() + "  " +
+                                                  event.descriptionEvent,
+                                        boxColor: Color.fromARGB(255, 185, 232, 234),
+                                      ),
+                                );
                               }).toList(),
                             );
                           }),
