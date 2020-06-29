@@ -168,8 +168,24 @@ mixin _$EventStore on _EventStoreBase, Store {
   final _$addEventDataAsyncAction = AsyncAction('_EventStoreBase.addEventData');
 
   @override
-  Future<bool> addEventData(EventData e, String uId, String cId) {
-    return _$addEventDataAsyncAction.run(() => super.addEventData(e, uId, cId));
+  Future<bool> addEventData(EventData e, String uId) {
+    return _$addEventDataAsyncAction.run(() => super.addEventData(e, uId));
+  }
+
+  final _$updateEventDataAsyncAction =
+      AsyncAction('_EventStoreBase.updateEventData');
+
+  @override
+  Future<bool> updateEventData(EventData e, String uId) {
+    return _$updateEventDataAsyncAction
+        .run(() => super.updateEventData(e, uId));
+  }
+
+  final _$removeEventAsyncAction = AsyncAction('_EventStoreBase.removeEvent');
+
+  @override
+  Future<bool> removeEvent(EventData e, String uId) {
+    return _$removeEventAsyncAction.run(() => super.removeEvent(e, uId));
   }
 
   final _$_EventStoreBaseActionController =

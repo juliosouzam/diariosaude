@@ -66,7 +66,7 @@ abstract class _EventStoreBase with Store {
   bool get istipoValid => tipoEvent.isNotEmpty;
 
   @action
-  Future<bool> addEventData(EventData e, String uId, String cId) async{
+  Future<bool> addEventData(EventData e, String uId) async{
     loading = true;
     try{
       listEvent.add(e);
@@ -74,7 +74,7 @@ abstract class _EventStoreBase with Store {
           .collection("users")
           .document(uId)
           .collection("children")
-          .document(cId)
+          .document(e.cid)
           .collection("eventos")
           .add(e.toMap())
           .then((doc) {
@@ -83,6 +83,72 @@ abstract class _EventStoreBase with Store {
       });
       loading = false;
 
+      return true;
+    } catch(error){
+      loading = false;
+      return false;
+    }
+
+  }
+
+  @action
+  Future<bool> updateEventData(EventData e, String uId) async{
+    loading = true;
+    try{
+
+      await Firestore.instance
+          .collection("users")
+          .document(uId)
+          .collection("children")
+          .document(e.cid)
+          .collection("eventos")
+          .document(e.eid)
+          .updateData(e.toMap()).then((e){
+
+      }).catchError((e){
+        print(e);
+      });
+
+      loading = false;
+      nomeEvent = "";
+      dateEvent = null;
+      horarioEvent = "";
+      descricaoEvent = "";
+      tipoEvent = "";
+      getEventos(uId, e.cid);
+      return true;
+    } catch(error){
+      loading = false;
+      return false;
+    }
+
+  }
+
+  @action
+  Future<bool> removeEvent(EventData e, String uId) async{
+    loading = true;
+    try{
+
+      await Firestore.instance
+          .collection("users")
+          .document(uId)
+          .collection("children")
+          .document(e.cid)
+          .collection("eventos")
+          .document(e.eid)
+          .delete().then((e){
+
+      }).catchError((e){
+        print(e);
+      });
+
+      loading = false;
+      nomeEvent = "";
+      dateEvent = null;
+      horarioEvent = "";
+      descricaoEvent = "";
+      tipoEvent = "";
+      getEventos(uId, e.cid);
       return true;
     } catch(error){
       loading = false;

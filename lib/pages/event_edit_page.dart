@@ -11,32 +11,55 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:mobx/mobx.dart';
 
 
-class CreateNewTaskPage extends StatefulWidget {
+class EventEditPage extends StatefulWidget {
   final String cId;
-  CreateNewTaskPage(this.cId);
+  EventData eventData;
+  EventEditPage(this.eventData, this.cId);
   final dateFormat = DateFormat('dd-MM-yyyy');
   final timeFormat = DateFormat('HH:mm');
 
   @override
-  _CreateNewTaskPageState createState() => _CreateNewTaskPageState(cId);
+  _EventEditPageState createState() => _EventEditPageState(eventData, cId);
 }
 
-class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
+class _EventEditPageState extends State<EventEditPage> {
 
   final String cid;
-  _CreateNewTaskPageState(this.cid);
+  EventData eventData;
+  _EventEditPageState(this.eventData, this.cid);
 
-  final _horarioController = TextEditingController();
+  static CircleAvatar removeIcon() {
+    return CircleAvatar(
+      radius: 25.0,
+      backgroundColor: ThemeColors.secondary,
+      child: Icon(
+        Icons.delete,
+        size: 20.0,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _nomeController = TextEditingController();
+  final _dateEventController = TextEditingController();
+  final _hourEventController = TextEditingController();
+  final _descricaoController = TextEditingController();
 
   @override
   void initState() {
-    eventStore.setNomeEvent("");
-    eventStore.setDateEvent(null);
-    eventStore.setHorarioEvent("");
-    eventStore.setDescricaoEvent("");
-    eventStore.seTipoEvent(true, "");
+    _nomeController.text = eventData.nameEvent;
+    _dateEventController.text = dateFormat.format(eventData.dateEvent);
+    _hourEventController.text = eventData.horarioEvent;
+    _descricaoController.text = eventData.descriptionEvent;
+    eventStore.setNomeEvent(eventData.nameEvent);
+    eventStore.setDateEvent(eventData.dateEvent);
+    eventStore.setHorarioEvent(eventData.horarioEvent);
+    eventStore.setDescricaoEvent(eventData.descriptionEvent);
+    eventStore.seTipoEvent(true, eventData.typeEvent);
     super.initState();
   }
 
@@ -68,13 +91,20 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                     height: 30,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    //mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('Novo evento',
+                      Text('Editar evento',
                           style: TextStyle(
                               fontSize: 30.0,
                               fontWeight: FontWeight.w700,
                               color: ThemeColors.background)),
+                      GestureDetector(
+                        onTap: () {
+                          showAlertDialog(context, eventData);
+                        },
+                        child: removeIcon(),
+                      ),
                     ],
                   ),
                   SizedBox(height: 15),
@@ -86,6 +116,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                           children: <Widget>[
                             Observer(builder: (_){
                               return TextFormField(
+                                controller: _nomeController,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   icon: Icon(Icons.title),
@@ -107,6 +138,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                               children: <Widget>[
                                 Expanded(
                                   child: DateTimeField(
+                                    controller: _dateEventController,
                                     format: widget.dateFormat,
                                     onChanged: (value){
                                       eventStore.setDateEvent(value);
@@ -145,9 +177,9 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                   child: Column(
                     children: <Widget>[
                       DateTimeField(
-                        controller: _horarioController,
+                        controller: _hourEventController,
                         onChanged: (value){
-                          eventStore.setHorarioEvent(_horarioController.text);
+                          eventStore.setHorarioEvent(_hourEventController.text);
                         },
                         validator: (value){
                           if(eventStore.isHorarioValid){
@@ -165,7 +197,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                           final time = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.fromDateTime(
-                                currentValue ?? DateTime.now()),
+                                currentValue ?? eventStore.horarioEvent),
                           );
                           return DateTimeField.convert(time);
                         },
@@ -173,6 +205,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                       SizedBox(height: 15),
                       Observer(builder: (_){
                         return TextFormField(
+                          controller: _descricaoController,
                           maxLines: 3,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
@@ -247,17 +280,15 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                     return GestureDetector(
                       onTap: () async {
                         if (_formKey.currentState.validate()) {
-                          EventData eventData = EventData();
                           eventData.nameEvent = eventStore.nomeEvent;
                           eventData.dateEvent = eventStore.dateEvent;
                           eventData.horarioEvent = eventStore.horarioEvent;
                           eventData.descriptionEvent = eventStore.descricaoEvent;
                           eventData.typeEvent = eventStore.tipoEvent;
-                          eventData.cid = cid;
 
                           bool result = false;
-                          result = await eventStore.addEventData(eventData,
-                                      loginStore.currentUser.value.uid);
+                          result = await eventStore.updateEventData(eventData,
+                              loginStore.currentUser.value.uid);
                           if(result){
                             _onSuccess();
                           }
@@ -277,7 +308,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                           ),
                         )
                             :Text(
-                          'Criar evento',
+                          'Atualizar evento',
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -305,7 +336,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
 
   void _onSuccess() {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text("Evento Criado com Sucesso!"),
+      content: Text("Evento Atualizado com Sucesso!"),
       backgroundColor: Colors.green,
       duration: Duration(seconds: 2),
     ));
@@ -314,11 +345,44 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
 
   void _onFailure() {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text("Falha ao criar Evento!"),
+      content: Text("Falha ao Atualizar Evento!"),
       backgroundColor: Colors.redAccent,
       duration: Duration(seconds: 2),
     ));
   }
 
+}
+
+showAlertDialog(BuildContext context, EventData event) {
+  Widget cancelaButton = FlatButton(
+    child: Text("Cancelar"),
+    onPressed:  () {
+      Navigator.of(context).pop();
+    },
+  );
+  Widget continuaButton = FlatButton(
+    child: Text("Continuar"),
+    onPressed:  () {
+      eventStore.removeEvent(event, loginStore.currentUser.value.uid);
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    },
+  );
+  AlertDialog alert = AlertDialog(
+    title: Text("Deletar Evento?"),
+    content: Text("Se deletar perderá todos os dados relacionados a esse Evento, Tem certeza que quer DELETAR?"),
+    actions: [
+      cancelaButton,
+      continuaButton,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }
 
