@@ -137,26 +137,25 @@ mixin _$ChildStore on _ChildStoreBase, Store {
     });
   }
 
-  final _$addFilhoAtom = Atom(name: '_ChildStoreBase.addFilho');
-
-  @override
-  bool get addFilho {
-    _$addFilhoAtom.reportRead();
-    return super.addFilho;
-  }
-
-  @override
-  set addFilho(bool value) {
-    _$addFilhoAtom.reportWrite(value, super.addFilho, () {
-      super.addFilho = value;
-    });
-  }
-
   final _$addChildAsyncAction = AsyncAction('_ChildStoreBase.addChild');
 
   @override
   Future<bool> addChild() {
     return _$addChildAsyncAction.run(() => super.addChild());
+  }
+
+  final _$updateChildAsyncAction = AsyncAction('_ChildStoreBase.updateChild');
+
+  @override
+  Future<bool> updateChild(String urlOld, String cId) {
+    return _$updateChildAsyncAction.run(() => super.updateChild(urlOld, cId));
+  }
+
+  final _$removeChildAsyncAction = AsyncAction('_ChildStoreBase.removeChild');
+
+  @override
+  Future<bool> removeChild(String urlOld, String cId) {
+    return _$removeChildAsyncAction.run(() => super.removeChild(urlOld, cId));
   }
 
   @override
@@ -170,7 +169,6 @@ weight: ${weight},
 height: ${height},
 photo: ${photo},
 listChild: ${listChild},
-addFilho: ${addFilho},
 isFormValid: ${isFormValid}
     ''';
   }

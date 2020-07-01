@@ -1,46 +1,20 @@
 import 'package:diariosaude/data/child_data.dart';
+import 'package:diariosaude/data/event_data.dart';
 import 'package:diariosaude/pages/child_profile_page.dart';
-import 'package:diariosaude/pages/event_detail_page.dart';
+import 'package:diariosaude/pages/event_edit_page.dart';
 import 'package:diariosaude/pages/event_page.dart';
-import 'package:diariosaude/pages/home_page.dart';
-import 'package:diariosaude/pages/login_page.dart';
-import 'package:diariosaude/store/event_store.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/mobx.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-final EventStore eventStore = EventStore();
-
-class ChildDetailPage extends StatefulWidget {
-  final String name;
-  final String age;
-  final String image;
-  final String cId; // child id
-
-  const ChildDetailPage({Key key, this.name, this.age, this.image, this.cId})
-      : super(key: key);
-
-  @override
-  _ChildDetailPageState createState() => _ChildDetailPageState();
-}
-
-class _ChildDetailPageState extends State<ChildDetailPage> {
-
-  _ChildDetailPageState();
-  ReactionDisposer disposer;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    disposer = autorun((_) {
-      eventStore.getEventos(loginStore.currentUser.value.uid, widget.cId);
-    });
-
-  }
+class EventDetailPage extends StatelessWidget {
+  EventData eventData;
+  ChildData childData;
+  EventDetailPage(this.eventData, this.childData);
+  DateFormat dateFormat = DateFormat('dd-MM-yyyy');
 
   Text subheading(String title) {
     return Text(
@@ -53,12 +27,12 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
     );
   }
 
-  static CircleAvatar calendarIcon() {
+  static CircleAvatar editIcon() {
     return CircleAvatar(
       radius: 25.0,
       backgroundColor: ThemeColors.secondary,
       child: Icon(
-        Icons.calendar_today,
+        Icons.edit,
         size: 20.0,
         color: Colors.white,
       ),
@@ -68,7 +42,6 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: ThemeColors.background,
       body: SafeArea(
@@ -113,38 +86,27 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                                   onTap: (){
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
-                                            builder: (_) => ChildProfilePage(widget.cId)));
+                                            builder: (_) => ChildProfilePage(childData.cid)));
                                   },
                                   child: CircleAvatar(
                                     backgroundColor: ThemeColors.primaryVariant,
                                     radius: 35.0,
-                                    backgroundImage: NetworkImage(widget.image),
+                                    backgroundImage: NetworkImage(childData.photo),
                                   ),
                                 ),
-                                tag: widget.name),
+                                tag: childData.name),
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Container(
                                 child: Text(
-                                  widget.name,
+                                  childData.name,
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
                                     fontSize: 22.0,
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                child: Text(
-                                  widget.age,
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ),
@@ -170,44 +132,44 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              subheading('Eventos'),
+                              subheading('Detalhe do Evento'),
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              CreateNewTaskPage(widget.cId)));
+                                              EventEditPage(eventData, childData.cid)));
                                 },
-                                child: calendarIcon(),
+                                child: editIcon(),
                               ),
                             ],
                           ),
-                          Observer(builder: (_){
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: eventStore.listEventFilter.map((event){
-                                return GestureDetector(
-                                  onTap: (){
-                                    ChildData c = ChildData();
-                                    c.photo = widget.image;
-                                    c.cid = widget.cId;
-                                    c.name = widget.name;
-                                    Navigator.push(context, MaterialPageRoute(
-                                            builder: (context) => EventDetailPage(event, c)));
-                                  },
-                                  child: TaskContainer(
-                                        title: event.nameEvent,
-                                        subtitle: event.dateEvent.day.toString() + "-" +
-                                                  event.dateEvent.month.toString() +"-" +
-                                                  event.dateEvent.year.toString() + "  " +
-                                                  event.descriptionEvent,
-                                        boxColor: Color.fromARGB(255, 185, 232, 234),
-                                      ),
-                                );
-                              }).toList(),
-                            );
-                          }),
+                          TaskContainer(
+                            title: "Nome",
+                            subtitle: eventData.nameEvent,
+                            boxColor: Color.fromARGB(255, 185, 232, 234),
+                          ),
+                          TaskContainer(
+                            title: "Data",
+                            subtitle: dateFormat.format(eventData.dateEvent),
+                            boxColor: Color.fromARGB(255, 185, 232, 234),
+                          ),
+                          TaskContainer(
+                            title: "Horário",
+                            subtitle: eventData.horarioEvent.toString(),
+                            boxColor: Color.fromARGB(255, 185, 232, 234),
+                          ),
+                          TaskContainer(
+                            title: "Descrição",
+                            subtitle: eventData.descriptionEvent,
+                            boxColor: Color.fromARGB(255, 185, 232, 234),
+                          ),
+                          TaskContainer(
+                            title: "tipo",
+                            subtitle: eventData.typeEvent,
+                            boxColor: Color.fromARGB(255, 185, 232, 234),
+                          ),
                         ],
                       ),
                     ),
@@ -219,10 +181,5 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
         ),
       ),
     );
-  }
-  @override
-  void dispose() {
-    disposer();
-    super.dispose();
   }
 }
