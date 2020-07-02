@@ -37,6 +37,9 @@ abstract class _ChildStoreBase with Store {
   @observable
   ObservableList<ChildData> listChild = ObservableList<ChildData>();
 
+  @observable
+  bool adicionando = false;
+
   @computed
   bool get isFormValid =>
       name != null &&
@@ -51,6 +54,7 @@ abstract class _ChildStoreBase with Store {
   @action
   Future<bool> addChild() async {
     try{
+      adicionando = true;
       ChildData data = ChildData();
       data.name = name;
       data.dateBirth = dateBirth;
@@ -83,8 +87,10 @@ abstract class _ChildStoreBase with Store {
       weight = "";
       height = "";
       photo = null;
+      adicionando = false;
       return true;
     }catch(error){
+      adicionando = false;
       return false;
     }
 
@@ -110,6 +116,7 @@ abstract class _ChildStoreBase with Store {
   Future<bool> updateChild(String urlOld, String cId) async {
 
     try{
+      adicionando = true;
       ChildData data = ChildData();
       data.name = name;
       data.dateBirth = dateBirth;
@@ -149,8 +156,10 @@ abstract class _ChildStoreBase with Store {
       height = "";
       photo = null;
       getChildren(parentId);
+      adicionando = false;
       return true;
     }catch(error){
+      adicionando = false;
       return false;
     }
 
@@ -159,6 +168,7 @@ abstract class _ChildStoreBase with Store {
   @action
   Future<bool> removeChild(String urlOld, String cId) async{
     try{
+      adicionando = true;
       FirebaseStorage.instance
           .getReferenceFromUrl(urlOld).then((ref){
         ref.delete();
@@ -178,7 +188,10 @@ abstract class _ChildStoreBase with Store {
       height = "";
       photo = null;
       getChildren(parentId);
+      adicionando = false;
+      return true;
     }catch(error){
+      adicionando = false;
       return false;
     }
 

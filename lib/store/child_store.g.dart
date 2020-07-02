@@ -137,6 +137,21 @@ mixin _$ChildStore on _ChildStoreBase, Store {
     });
   }
 
+  final _$adicionandoAtom = Atom(name: '_ChildStoreBase.adicionando');
+
+  @override
+  bool get adicionando {
+    _$adicionandoAtom.reportRead();
+    return super.adicionando;
+  }
+
+  @override
+  set adicionando(bool value) {
+    _$adicionandoAtom.reportWrite(value, super.adicionando, () {
+      super.adicionando = value;
+    });
+  }
+
   final _$addChildAsyncAction = AsyncAction('_ChildStoreBase.addChild');
 
   @override
@@ -169,6 +184,7 @@ weight: ${weight},
 height: ${height},
 photo: ${photo},
 listChild: ${listChild},
+adicionando: ${adicionando},
 isFormValid: ${isFormValid}
     ''';
   }
