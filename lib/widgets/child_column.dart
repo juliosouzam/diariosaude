@@ -1,3 +1,4 @@
+import 'package:diariosaude/data/child_data.dart';
 import 'package:diariosaude/pages/child_detail_page.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +9,7 @@ class ChildColum extends StatelessWidget {
   final String age;
   final String image;
   final String cId;
+  final ChildData childData;
   ChildColum({
     this.icon,
     this.iconBackgroundColor,
@@ -15,6 +17,7 @@ class ChildColum extends StatelessWidget {
     this.age,
     this.image,
     this.cId,
+    this.childData,
   });
 
   @override
@@ -27,6 +30,7 @@ class ChildColum extends StatelessWidget {
                   age: age,
                   image: image,
                   cId: cId,
+                  childData: childData,
                 )));
       },
       title: Text(name),

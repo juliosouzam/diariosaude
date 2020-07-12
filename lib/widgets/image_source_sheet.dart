@@ -25,7 +25,7 @@ class ImageSourceSheet extends StatelessWidget {
             child: Text('Câmera'),
             onPressed: () async {
               File file =
-                  await ImagePicker.pickImage(source: ImageSource.camera, imageQuality: 70);
+                  await ImagePicker.pickImage(source: ImageSource.camera, imageQuality: 70, maxHeight: 480, maxWidth: 480);
               imageSelected(file);
             },
           ),
@@ -33,7 +33,7 @@ class ImageSourceSheet extends StatelessWidget {
             child: Text('Galeria'),
             onPressed: () async {
               File file =
-                  await ImagePicker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+                  await ImagePicker.pickImage(source: ImageSource.gallery, imageQuality: 70, maxHeight: 480, maxWidth: 480);
               imageSelected(file);
             },
           ),
