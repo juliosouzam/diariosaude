@@ -72,7 +72,7 @@ class _ChildProfilePage extends State<ChildProfilePage> {
         child:  Column(
           children: <Widget>[
             TopContainer(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               width: width,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,7 +143,7 @@ class _ChildProfilePage extends State<ChildProfilePage> {
                             controller: _nomeController,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
-                              icon: Icon(Icons.account_circle),
+                              suffixIcon: Icon(Icons.account_circle),
                               hintText: 'Nome',
                             ),
                             keyboardType: TextInputType.text,
@@ -247,68 +247,76 @@ class _ChildProfilePage extends State<ChildProfilePage> {
                           ),
                         ],
                       ),
+                      SizedBox(height: 40.0,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Observer(builder: (_){
+                            return RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Salvar',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 18),
+                                ),
+                                color: Theme.of(context).primaryColor,
+                                disabledColor: Theme.of(context).primaryColor.withAlpha(100),
+                                textColor: Colors.white,
+                                onPressed: !childStore.adicionando ? () {
+                                  childStore.parentId = loginStore.currentUser.value.uid;
+                                  if (!childStore.isFormValid) {
+                                    _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                      content: Text("Todos os campos são obrigatórios!"),
+                                      backgroundColor: Colors.redAccent,
+                                      duration: Duration(seconds: 2),
+                                    ));
+                                    return;
+                                  }
+
+                                  childStore.updateChild(childData.photo, childData.cid);
+
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                  //pushReplacement(
+                                  //    MaterialPageRoute(
+                                  //        builder: (_) => HomePage()));
+                                } : null
+                            );
+                          },),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Observer(builder: (_){
+                            return RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Deletar',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 18),
+                                ),
+                                color: Theme.of(context).primaryColor,
+                                disabledColor: Theme.of(context).primaryColor.withAlpha(100),
+                                textColor: Colors.white,
+                                onPressed: !childStore.adicionando ? () {
+                                  showAlertDialog(context);
+
+                                } : null
+                            );
+                          },)
+
+                        ],
+                      ),
                     ],
                   ),
                 )),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                RaisedButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Salvar',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18),
-                    ),
-                    color: Theme.of(context).primaryColor,
-                    disabledColor: Theme.of(context).primaryColor.withAlpha(100),
-                    textColor: Colors.white,
-                    onPressed: () {
-                      childStore.parentId = loginStore.currentUser.value.uid;
-                      if (!childStore.isFormValid) {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text("Todos os campos são obrigatórios!"),
-                          backgroundColor: Colors.redAccent,
-                          duration: Duration(seconds: 2),
-                        ));
-                        return;
-                      }
-
-                      childStore.updateChild(childData.photo, childData.cid);
-
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      //pushReplacement(
-                      //    MaterialPageRoute(
-                      //        builder: (_) => HomePage()));
-                    }),
-                SizedBox(
-                  width: 20,
-                ),
-                RaisedButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Deletar',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18),
-                    ),
-                    color: Theme.of(context).primaryColor,
-                    disabledColor: Theme.of(context).primaryColor.withAlpha(100),
-                    textColor: Colors.white,
-                    onPressed: () {
-                      showAlertDialog(context);
-
-                    }),
-              ],
-            ),
           ],
         ),
       ),

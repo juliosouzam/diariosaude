@@ -2,6 +2,7 @@ import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/child_store.dart';
 import 'package:diariosaude/store/user_store.dart';
+import 'package:diariosaude/store/vacina_store.dart';
 import 'package:diariosaude/widgets/child_column.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 
 final ChildStore childStore = ChildStore();
+final VacinaStore vacinaStore = VacinaStore();
 
 class HomePage extends StatefulWidget {
   @override
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
     disposer = autorun((_){
       childStore.getChildren(loginStore.currentUser.value.uid);
+
     });
 
   }
@@ -191,6 +194,7 @@ class _HomePageState extends State<HomePage> {
                       Observer(builder: (_){
                         return Column(
                             children: childStore.listChild.map((child){
+                              vacinaStore.loadVacina();
                               return Card(
                                   margin: EdgeInsets.symmetric(
                                       horizontal: 0.0, vertical: 4.0),
@@ -198,9 +202,10 @@ class _HomePageState extends State<HomePage> {
                                     icon: Icons.blur_circular,
                                     iconBackgroundColor: ThemeColors.primaryVariant,
                                     name: child.name,
-                                    age: _calculaIdade(DateTime.now(), child.dateBirth),
+                                    age: vacinaStore.calculaIdadeString(DateTime.now(), child.dateBirth),
                                     image: child.photo,
                                     cId: child.cid,
+                                    childData: child,
                                   ));
                             }).toList(),
                           );
@@ -292,6 +297,9 @@ String _calculaIdade(DateTime data, DateTime nasc){
       idade = ano.toString() + " Anos, " + mes.toString() + " Meses e " + dia.toString() +
           " Dias.";
     }
+  }
+  if(ano< 0){
+    idade = "0 Dias";
   }
 
   return idade;
