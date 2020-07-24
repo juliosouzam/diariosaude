@@ -82,7 +82,7 @@ abstract class _EventStoreBase with Store {
          print(e);
       });
       loading = false;
-
+      getEventos(uId, e.cid);
       return true;
     } catch(error){
       loading = false;

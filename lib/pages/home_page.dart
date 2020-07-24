@@ -1,3 +1,4 @@
+import 'package:diariosaude/data/child_data.dart';
 import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/child_store.dart';
@@ -23,14 +24,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   ReactionDisposer disposer;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     disposer = autorun((_){
       childStore.getChildren(loginStore.currentUser.value.uid);
-
     });
-
   }
   Text subheading(String title) {
     return Text(
@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Observer(builder: (_){
                         return Column(
-                            children: childStore.listChild.map((child){
+                              children: childStore.listChild.map((child){
                               vacinaStore.loadVacina();
                               return Card(
                                   margin: EdgeInsets.symmetric(
