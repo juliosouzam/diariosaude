@@ -6,7 +6,7 @@ part of 'child_store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ChildStore on _ChildStoreBase, Store {
   Computed<bool> _$isFormValidComputed;
@@ -122,6 +122,21 @@ mixin _$ChildStore on _ChildStoreBase, Store {
     });
   }
 
+  final _$adicionandoAtom = Atom(name: '_ChildStoreBase.adicionando');
+
+  @override
+  bool get adicionando {
+    _$adicionandoAtom.reportRead();
+    return super.adicionando;
+  }
+
+  @override
+  set adicionando(bool value) {
+    _$adicionandoAtom.reportWrite(value, super.adicionando, () {
+      super.adicionando = value;
+    });
+  }
+
   final _$listChildAtom = Atom(name: '_ChildStoreBase.listChild');
 
   @override
@@ -168,6 +183,7 @@ hourBirth: ${hourBirth},
 weight: ${weight},
 height: ${height},
 photo: ${photo},
+adicionando: ${adicionando},
 listChild: ${listChild},
 isFormValid: ${isFormValid}
     ''';

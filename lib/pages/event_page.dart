@@ -1,14 +1,12 @@
 import 'package:diariosaude/data/event_data.dart';
 import 'package:diariosaude/pages/child_detail_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
-import 'package:diariosaude/store/event_store.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:mobx/mobx.dart';
 
 
 class CreateNewTaskPage extends StatefulWidget {

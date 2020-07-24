@@ -13,7 +13,7 @@ class TopContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding:
-          padding != null ? padding : EdgeInsets.symmetric(horizontal: 20.0),
+          padding != null ? padding : EdgeInsets.symmetric(horizontal: 10.0),
       decoration: BoxDecoration(
           color: ThemeColors.primary,
           borderRadius: BorderRadius.only(

@@ -1,4 +1,5 @@
 import 'package:diariosaude/data/child_data.dart';
+import 'package:diariosaude/data/vacina_data.dart';
 import 'package:diariosaude/pages/child_profile_page.dart';
 import 'package:diariosaude/pages/event_detail_page.dart';
 import 'package:diariosaude/pages/event_page.dart';
@@ -9,6 +10,7 @@ import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -20,18 +22,48 @@ class ChildDetailPage extends StatefulWidget {
   final String age;
   final String image;
   final String cId; // child id
+  final ChildData childData;
 
-  const ChildDetailPage({Key key, this.name, this.age, this.image, this.cId})
+  const ChildDetailPage({Key key, this.name, this.age, this.image, this.cId, this.childData})
       : super(key: key);
 
   @override
-  _ChildDetailPageState createState() => _ChildDetailPageState();
+  _ChildDetailPageState createState() => _ChildDetailPageState(childData);
 }
 
 class _ChildDetailPageState extends State<ChildDetailPage> {
-
-  _ChildDetailPageState();
+  ChildData childData;
+  _ChildDetailPageState(this.childData);
   ReactionDisposer disposer;
+  DateTime idade;
+  String intervalo;
+  List<VacinaData> vacinas;
+  List<String> nomeVacinas;
+
+  @override
+  void initState() {
+    super.initState();
+
+    idade = vacinaStore.transfomarStringToDate(vacinaStore.calculaIdadeDate(DateTime.now(), childData.dateBirth));
+    intervalo = vacinaStore.intervaloVacina(idade);
+    vacinas = vacinaStore.listVacinas.where((filter) => filter.idade.compareTo(intervalo) == 0).toList();
+    nomeVacinas = vacinas.map((f) => f.nomeVacina).toList();
+    String idadeACompletar = vacinaStore.idadeCompletar(idade);
+    String singular = "Parabéns. Filho(a) ${childData.name + " " + idadeACompletar} Segundo o ministério da saúde, é recomendado que seja aplicado essa vacina: " + nomeVacinas.toString();
+    String plural = "Parabéns. Filho(a) ${childData.name + " " + idadeACompletar} Segundo o ministério da saúde, é recomendado que sejam aplicadas essas vacinas: " + nomeVacinas.toString();
+    if (vacinas.isNotEmpty) {
+      SchedulerBinding.instance.addPostFrameCallback((_) =>
+          showDialog(
+              context: context,
+              builder: (context) =>
+                  AlertDialog(
+                    title: Text(vacinas.length > 1 ? "Vacinas" : "Vacina",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24), ),
+                    content: Text(vacinas.length > 1 ? plural : singular,
+                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                 )));
+    }
+  }
 
   @override
   void didChangeDependencies() {
