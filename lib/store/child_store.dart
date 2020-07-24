@@ -35,10 +35,10 @@ abstract class _ChildStoreBase with Store {
   File photo;
 
   @observable
-  ObservableList<ChildData> listChild = ObservableList<ChildData>();
+  bool adicionando = false;
 
   @observable
-  bool adicionando = false;
+  ObservableList<ChildData> listChild = ObservableList<ChildData>();
 
   @computed
   bool get isFormValid =>
@@ -72,8 +72,6 @@ abstract class _ChildStoreBase with Store {
       String url = await taskSnapshot.ref.getDownloadURL();
       data.photo = url;
 
-      listChild.add(data);
-
       await Firestore.instance
           .collection("users")
           .document(parentId)
@@ -87,6 +85,7 @@ abstract class _ChildStoreBase with Store {
       weight = "";
       height = "";
       photo = null;
+      getChildren(parentId);
       adicionando = false;
       return true;
     }catch(error){
@@ -102,7 +101,6 @@ abstract class _ChildStoreBase with Store {
         .document(uId)
         .collection("children")
         .getDocuments();
-
     listChild = query.documents.map((doc) => ChildData.fromDocument(doc)).toList().asObservable();
   }
 

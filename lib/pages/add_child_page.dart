@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
-import 'package:diariosaude/store/child_store.dart';
 import 'package:diariosaude/widgets/image_source_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
@@ -22,7 +22,6 @@ class AddChildPage extends StatefulWidget {
 
 class _AddChildPageState extends State<AddChildPage> {
   File _image;
-  final ChildStore childStore = ChildStore();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -207,7 +206,7 @@ class _AddChildPageState extends State<AddChildPage> {
 
                         await childStore.addChild();
 
-                        Navigator.pop(context);
+                        Navigator.of(context).pop();
                       },
                       child: Container(
                         height: 40,
