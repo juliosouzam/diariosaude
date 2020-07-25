@@ -1,13 +1,19 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventData {
-  String eid;//id do evento
-  String cid;//id do filho
+  String eid; //id do evento
+  String cid; //id do filho
   String nameEvent;
   DateTime dateEvent;
   String horarioEvent;
   String descriptionEvent;
   String typeEvent;
+  File photo;
+  String photoUrl;
+  File document;
+  String documentUrl;
 
   EventData();
 
@@ -29,6 +35,8 @@ class EventData {
       "horarioEvent": horarioEvent,
       "descriptionEvent": descriptionEvent,
       "typeEvent": typeEvent,
+      "photo": photoUrl,
+      "document": documentUrl,
     };
   }
 }

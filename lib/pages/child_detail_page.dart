@@ -24,7 +24,8 @@ class ChildDetailPage extends StatefulWidget {
   final String cId; // child id
   final ChildData childData;
 
-  const ChildDetailPage({Key key, this.name, this.age, this.image, this.cId, this.childData})
+  const ChildDetailPage(
+      {Key key, this.name, this.age, this.image, this.cId, this.childData})
       : super(key: key);
 
   @override
@@ -44,24 +45,33 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
   void initState() {
     super.initState();
 
-    idade = vacinaStore.transfomarStringToDate(vacinaStore.calculaIdadeDate(DateTime.now(), childData.dateBirth));
+    idade = vacinaStore.transfomarStringToDate(
+        vacinaStore.calculaIdadeDate(DateTime.now(), childData.dateBirth));
     intervalo = vacinaStore.intervaloVacina(idade);
-    vacinas = vacinaStore.listVacinas.where((filter) => filter.idade.compareTo(intervalo) == 0).toList();
+    vacinas = vacinaStore.listVacinas
+        .where((filter) => filter.idade.compareTo(intervalo) == 0)
+        .toList();
     nomeVacinas = vacinas.map((f) => f.nomeVacina).toList();
     String idadeACompletar = vacinaStore.idadeCompletar(idade);
-    String singular = "Parabéns. Filho(a) ${childData.name + " " + idadeACompletar} Segundo o ministério da saúde, é recomendado que seja aplicado essa vacina: " + nomeVacinas.toString();
-    String plural = "Parabéns. Filho(a) ${childData.name + " " + idadeACompletar} Segundo o ministério da saúde, é recomendado que sejam aplicadas essas vacinas: " + nomeVacinas.toString();
+    String singular =
+        "Parabéns. Filho(a) ${childData.name + " " + idadeACompletar} Segundo o ministério da saúde, é recomendado que seja aplicado essa vacina: " +
+            nomeVacinas.toString();
+    String plural =
+        "Parabéns. Filho(a) ${childData.name + " " + idadeACompletar} Segundo o ministério da saúde, é recomendado que sejam aplicadas essas vacinas: " +
+            nomeVacinas.toString();
     if (vacinas.isNotEmpty) {
-      SchedulerBinding.instance.addPostFrameCallback((_) =>
-          showDialog(
-              context: context,
-              builder: (context) =>
-                  AlertDialog(
-                    title: Text(vacinas.length > 1 ? "Vacinas" : "Vacina",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24), ),
-                    content: Text(vacinas.length > 1 ? plural : singular,
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
-                 )));
+      SchedulerBinding.instance.addPostFrameCallback((_) => showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(
+                  vacinas.length > 1 ? "Vacinas" : "Vacina",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                ),
+                content: Text(
+                  vacinas.length > 1 ? plural : singular,
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                ),
+              )));
     }
   }
 
@@ -71,7 +81,6 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
     disposer = autorun((_) {
       eventStore.getEventos(loginStore.currentUser.value.uid, widget.cId);
     });
-
   }
 
   Text subheading(String title) {
@@ -142,10 +151,11 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                             backgroundColor: ThemeColors.primary,
                             center: Hero(
                                 child: GestureDetector(
-                                  onTap: (){
+                                  onTap: () {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
-                                            builder: (_) => ChildProfilePage(widget.cId)));
+                                            builder: (_) =>
+                                                ChildProfilePage(widget.cId)));
                                   },
                                   child: CircleAvatar(
                                     backgroundColor: ThemeColors.primaryVariant,
@@ -215,27 +225,34 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                               ),
                             ],
                           ),
-                          Observer(builder: (_){
+                          Observer(builder: (_) {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: eventStore.listEventFilter.map((event){
+                              children: eventStore.listEventFilter.map((event) {
                                 return GestureDetector(
-                                  onTap: (){
+                                  onTap: () {
                                     ChildData c = ChildData();
                                     c.photo = widget.image;
                                     c.cid = widget.cId;
                                     c.name = widget.name;
-                                    Navigator.push(context, MaterialPageRoute(
-                                            builder: (context) => EventDetailPage(event, c)));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EventDetailPage(event, c)));
                                   },
                                   child: TaskContainer(
-                                        title: event.nameEvent,
-                                        subtitle: event.dateEvent.day.toString() + "-" +
-                                                  event.dateEvent.month.toString() +"-" +
-                                                  event.dateEvent.year.toString() + "  " +
-                                                  event.descriptionEvent,
-                                        boxColor: Color.fromARGB(255, 185, 232, 234),
-                                      ),
+                                    title: event.nameEvent,
+                                    subtitle: event.dateEvent.day.toString() +
+                                        "-" +
+                                        event.dateEvent.month.toString() +
+                                        "-" +
+                                        event.dateEvent.year.toString() +
+                                        "  " +
+                                        event.descriptionEvent,
+                                    boxColor:
+                                        Color.fromARGB(255, 185, 232, 234),
+                                  ),
                                 );
                               }).toList(),
                             );
@@ -252,6 +269,7 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
       ),
     );
   }
+
   @override
   void dispose() {
     disposer();

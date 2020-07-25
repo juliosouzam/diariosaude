@@ -1,7 +1,6 @@
 import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/child_store.dart';
-import 'package:diariosaude/store/user_store.dart';
 import 'package:diariosaude/store/vacina_store.dart';
 import 'package:diariosaude/widgets/child_column.dart';
 import 'package:diariosaude/widgets/task_container.dart';
@@ -21,17 +20,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   ReactionDisposer disposer;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    disposer = autorun((_){
-      childStore.getChildren(loginStore.currentUser.value.uid);
-
+    setState(() {
+      disposer = autorun((_) {
+        childStore.getChildren(loginStore.currentUser.value.uid);
+      });
     });
-
   }
+
   Text subheading(String title) {
     return Text(
       title,
@@ -117,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                               progressColor: ThemeColors.secondary,
                               backgroundColor: ThemeColors.primary,
                               center: GestureDetector(
-                                onTap: (){},
+                                onTap: () {},
                                 child: CircleAvatar(
                                   backgroundColor: ThemeColors.primaryVariant,
                                   radius: 35.0,
@@ -191,24 +190,27 @@ class _HomePageState extends State<HomePage> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
                       ),
-                      Observer(builder: (_){
+                      Observer(builder: (_) {
                         return Column(
-                            children: childStore.listChild.map((child){
-                              vacinaStore.loadVacina();
-                              return Card(
-                                  margin: EdgeInsets.symmetric(
-                                      horizontal: 0.0, vertical: 4.0),
-                                  child: ChildColum(
-                                    icon: Icons.blur_circular,
-                                    iconBackgroundColor: ThemeColors.primaryVariant,
-                                    name: child.name,
-                                    age: vacinaStore.calculaIdadeString(DateTime.now(), child.dateBirth),
-                                    image: child.photo,
-                                    cId: child.cid,
-                                    childData: child,
-                                  ));
-                            }).toList(),
-                          );
+                          children: childStore.listChild.map((child) {
+                            vacinaStore.loadVacina();
+
+                            return Card(
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 0.0, vertical: 4.0),
+                                child: ChildColum(
+                                  icon: Icons.blur_circular,
+                                  iconBackgroundColor:
+                                      ThemeColors.primaryVariant,
+                                  name: child.name,
+                                  age: vacinaStore.calculaIdadeString(
+                                      DateTime.now(), child.dateBirth),
+                                  image: child.photo,
+                                  cId: child.cid,
+                                  childData: child,
+                                ));
+                          }).toList(),
+                        );
                       }),
                       Container(
                         color: Colors.transparent,
@@ -258,47 +260,64 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-String _calculaIdade(DateTime data, DateTime nasc){
-
-  int dia; int ano; int mes;
+String _calculaIdade(DateTime data, DateTime nasc) {
+  int dia;
+  int ano;
+  int mes;
   String idade;
 
   ano = data.year - nasc.year;
   mes = data.month - nasc.month;
   dia = data.day - nasc.day;
 
-  if(dia<0){
-    mes = mes -1;
+  if (dia < 0) {
+    mes = mes - 1;
     dia = 30 + dia;
   }
-  if(mes<0){
-    ano = ano -1;
+  if (mes < 0) {
+    ano = ano - 1;
     mes = 12 + mes;
   }
-  if(ano == 0){
-    if(mes == 0){
+  if (ano == 0) {
+    if (mes == 0) {
       idade = dia.toString() + " Dias";
-    }else {
+    } else {
       idade = mes.toString() + " Mês e " + dia.toString() + " Dias";
     }
-  }else if(ano == 1){
-    if(mes == 1){
-      idade = ano.toString() + " Ano, " + mes.toString() + " Mês e " + dia.toString() +
+  } else if (ano == 1) {
+    if (mes == 1) {
+      idade = ano.toString() +
+          " Ano, " +
+          mes.toString() +
+          " Mês e " +
+          dia.toString() +
           " Dias.";
-    }else{
-      idade = ano.toString() + " Ano, " + mes.toString() + " Meses e " + dia.toString() +
+    } else {
+      idade = ano.toString() +
+          " Ano, " +
+          mes.toString() +
+          " Meses e " +
+          dia.toString() +
           " Dias.";
     }
-  }else{
-    if(mes == 1){
-      idade = ano.toString() + " Anos, " + mes.toString() + " Mês e " + dia.toString() +
+  } else {
+    if (mes == 1) {
+      idade = ano.toString() +
+          " Anos, " +
+          mes.toString() +
+          " Mês e " +
+          dia.toString() +
           " Dias.";
-    }else{
-      idade = ano.toString() + " Anos, " + mes.toString() + " Meses e " + dia.toString() +
+    } else {
+      idade = ano.toString() +
+          " Anos, " +
+          mes.toString() +
+          " Meses e " +
+          dia.toString() +
           " Dias.";
     }
   }
-  if(ano< 0){
+  if (ano < 0) {
     idade = "0 Dias";
   }
 

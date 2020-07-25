@@ -50,10 +50,9 @@ abstract class _ChildStoreBase with Store {
       parentId != null &&
       photo != null;
 
-
   @action
   Future<bool> addChild() async {
-    try{
+    try {
       adicionando = true;
       ChildData data = ChildData();
       data.name = name;
@@ -72,14 +71,13 @@ abstract class _ChildStoreBase with Store {
       String url = await taskSnapshot.ref.getDownloadURL();
       data.photo = url;
 
-      listChild.add(data);
+      listChild.insert(0, data);
 
       await Firestore.instance
           .collection("users")
           .document(parentId)
           .collection("children")
           .add(data.toMap());
-
 
       name = "";
       dateBirth = null;
@@ -89,11 +87,10 @@ abstract class _ChildStoreBase with Store {
       photo = null;
       adicionando = false;
       return true;
-    }catch(error){
+    } catch (error) {
       adicionando = false;
       return false;
     }
-
   }
 
   Future getChildren(String uId) async {
@@ -103,7 +100,10 @@ abstract class _ChildStoreBase with Store {
         .collection("children")
         .getDocuments();
 
-    listChild = query.documents.map((doc) => ChildData.fromDocument(doc)).toList().asObservable();
+    listChild = query.documents
+        .map((doc) => ChildData.fromDocument(doc))
+        .toList()
+        .asObservable();
   }
 
   ChildData getChild(String cId) {
@@ -111,11 +111,9 @@ abstract class _ChildStoreBase with Store {
     return childData[0];
   }
 
-
   @action
   Future<bool> updateChild(String urlOld, String cId) async {
-
-    try{
+    try {
       adicionando = true;
       ChildData data = ChildData();
       data.name = name;
@@ -125,10 +123,9 @@ abstract class _ChildStoreBase with Store {
       data.height = height;
       data.userId = parentId;
 
-      FirebaseStorage.instance
-          .getReferenceFromUrl(urlOld).then((ref){
+      FirebaseStorage.instance.getReferenceFromUrl(urlOld).then((ref) {
         ref.delete();
-      }).catchError((e){
+      }).catchError((e) {
         print(e);
       });
 
@@ -140,7 +137,6 @@ abstract class _ChildStoreBase with Store {
       StorageTaskSnapshot taskSnapshot = await task.onComplete;
       String url = await taskSnapshot.ref.getDownloadURL();
       data.photo = url;
-
 
       await Firestore.instance
           .collection("users")
@@ -158,21 +154,19 @@ abstract class _ChildStoreBase with Store {
       getChildren(parentId);
       adicionando = false;
       return true;
-    }catch(error){
+    } catch (error) {
       adicionando = false;
       return false;
     }
-
   }
 
   @action
-  Future<bool> removeChild(String urlOld, String cId) async{
-    try{
+  Future<bool> removeChild(String urlOld, String cId) async {
+    try {
       adicionando = true;
-      FirebaseStorage.instance
-          .getReferenceFromUrl(urlOld).then((ref){
+      FirebaseStorage.instance.getReferenceFromUrl(urlOld).then((ref) {
         ref.delete();
-      }).catchError((e){
+      }).catchError((e) {
         print(e);
       });
       await Firestore.instance
@@ -190,10 +184,9 @@ abstract class _ChildStoreBase with Store {
       getChildren(parentId);
       adicionando = false;
       return true;
-    }catch(error){
+    } catch (error) {
       adicionando = false;
       return false;
     }
-
   }
 }

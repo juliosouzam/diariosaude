@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diariosaude/data/event_data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:mobx/mobx.dart';
 
 part 'event_store.g.dart';
@@ -7,7 +10,6 @@ part 'event_store.g.dart';
 class EventStore = _EventStoreBase with _$EventStore;
 
 abstract class _EventStoreBase with Store {
-
   @observable
   String nomeEvent = "";
 
@@ -32,6 +34,12 @@ abstract class _EventStoreBase with Store {
   @observable
   bool loading = false;
 
+  @observable
+  File photo;
+
+  @observable
+  File document;
+
   @action
   void setNomeEvent(String value) => nomeEvent = value;
 
@@ -45,10 +53,15 @@ abstract class _EventStoreBase with Store {
   void setDescricaoEvent(String value) => descricaoEvent = value;
 
   @action
+  void setPhoto(File file) => photo = file;
+  
+  @action
+  void setDocument(File file) => document = file;
+  
+  @action
   void seTipoEvent(bool value, String tipo) {
     tipoEvent = value ? tipo : null;
   }
-
 
   @computed
   bool get isNomeValid => nomeEvent.isNotEmpty;
@@ -66,10 +79,32 @@ abstract class _EventStoreBase with Store {
   bool get istipoValid => tipoEvent.isNotEmpty;
 
   @action
-  Future<bool> addEventData(EventData e, String uId) async{
+  Future<bool> addEventData(EventData e, String uId) async {
     loading = true;
-    try{
+    try {
       listEvent.add(e);
+      if (e.photo != null) {
+        StorageUploadTask task = FirebaseStorage.instance
+            .ref()
+            .child(DateTime.now().millisecondsSinceEpoch.toString())
+            .putFile(e.photo);
+
+        StorageTaskSnapshot taskSnapshot = await task.onComplete;
+        String url = await taskSnapshot.ref.getDownloadURL();
+        e.photoUrl = url;
+      }
+
+      if (e.document != null) {
+        StorageUploadTask task = FirebaseStorage.instance
+            .ref()
+            .child(DateTime.now().millisecondsSinceEpoch.toString())
+            .putFile(e.document);
+
+        StorageTaskSnapshot taskSnapshot = await task.onComplete;
+        String url = await taskSnapshot.ref.getDownloadURL();
+        e.documentUrl = url;
+      }
+
       await Firestore.instance
           .collection("users")
           .document(uId)
@@ -77,25 +112,23 @@ abstract class _EventStoreBase with Store {
           .document(e.cid)
           .collection("eventos")
           .add(e.toMap())
-          .then((doc) {
-          }).catchError((e){
-         print(e);
+          .then((doc) {})
+          .catchError((e) {
+        print(e);
       });
       loading = false;
 
       return true;
-    } catch(error){
+    } catch (error) {
       loading = false;
       return false;
     }
-
   }
 
   @action
-  Future<bool> updateEventData(EventData e, String uId) async{
+  Future<bool> updateEventData(EventData e, String uId) async {
     loading = true;
-    try{
-
+    try {
       await Firestore.instance
           .collection("users")
           .document(uId)
@@ -103,9 +136,9 @@ abstract class _EventStoreBase with Store {
           .document(e.cid)
           .collection("eventos")
           .document(e.eid)
-          .updateData(e.toMap()).then((e){
-
-      }).catchError((e){
+          .updateData(e.toMap())
+          .then((e) {})
+          .catchError((e) {
         print(e);
       });
 
@@ -117,18 +150,16 @@ abstract class _EventStoreBase with Store {
       tipoEvent = "";
       getEventos(uId, e.cid);
       return true;
-    } catch(error){
+    } catch (error) {
       loading = false;
       return false;
     }
-
   }
 
   @action
-  Future<bool> removeEvent(EventData e, String uId) async{
+  Future<bool> removeEvent(EventData e, String uId) async {
     loading = true;
-    try{
-
+    try {
       await Firestore.instance
           .collection("users")
           .document(uId)
@@ -136,9 +167,9 @@ abstract class _EventStoreBase with Store {
           .document(e.cid)
           .collection("eventos")
           .document(e.eid)
-          .delete().then((e){
-
-      }).catchError((e){
+          .delete()
+          .then((e) {})
+          .catchError((e) {
         print(e);
       });
 
@@ -150,15 +181,14 @@ abstract class _EventStoreBase with Store {
       tipoEvent = "";
       getEventos(uId, e.cid);
       return true;
-    } catch(error){
+    } catch (error) {
       loading = false;
       return false;
     }
-
   }
 
   Future<bool> getEventos(String uId, String cId) async {
-    try{
+    try {
       QuerySnapshot query = await Firestore.instance
           .collection("users")
           .document(uId)
@@ -167,20 +197,23 @@ abstract class _EventStoreBase with Store {
           .collection("eventos")
           .getDocuments();
 
-      listEvent = query.documents.map((doc) => EventData.fromDocument(doc)).toList().asObservable();
+      listEvent = query.documents
+          .map((doc) => EventData.fromDocument(doc))
+          .toList()
+          .asObservable();
       listEventFilter = listEvent;
       DateTime data = DateTime.now();
-      listEventFilter = listEventFilter.where((filter) => filter.dateEvent.isAfter(DateTime.now()) ||
-          (filter.dateEvent.month == data.month
-              && filter.dateEvent.day == data.day
-              && filter.dateEvent.year == data.year) ).toList().asObservable();
+      listEventFilter = listEventFilter
+          .where((filter) =>
+              filter.dateEvent.isAfter(DateTime.now()) ||
+              (filter.dateEvent.month == data.month &&
+                  filter.dateEvent.day == data.day &&
+                  filter.dateEvent.year == data.year))
+          .toList()
+          .asObservable();
       return true;
-    }catch(error){
+    } catch (error) {
       return false;
     }
-
   }
-
-
-
 }
