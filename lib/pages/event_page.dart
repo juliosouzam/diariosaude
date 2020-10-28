@@ -227,6 +227,16 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                                     label: Text("Consulta"),
                                   );
                                 }),
+                                Observer(builder: (_){
+                                  return InputChip(
+                                    key: ObjectKey('rotina'),
+                                    selected: !!(eventStore.tipoEvent == "rotina"),
+                                    onSelected: (value){
+                                      eventStore.seTipoEvent(value, "rotina");
+                                    },
+                                    label: Text("Rotina"),
+                                  );
+                                }),
                               ],
                             ),
                           ],

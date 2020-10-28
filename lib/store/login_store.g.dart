@@ -209,6 +209,21 @@ mixin _$LoginStore on _LoginStoreBase, Store {
     });
   }
 
+  final _$alertFacebookAtom = Atom(name: '_LoginStoreBase.alertFacebook');
+
+  @override
+  String get alertFacebook {
+    _$alertFacebookAtom.reportRead();
+    return super.alertFacebook;
+  }
+
+  @override
+  set alertFacebook(String value) {
+    _$alertFacebookAtom.reportWrite(value, super.alertFacebook, () {
+      super.alertFacebook = value;
+    });
+  }
+
   final _$isLoggedInAsyncAction = AsyncAction('_LoginStoreBase.isLoggedIn');
 
   @override
@@ -333,6 +348,17 @@ mixin _$LoginStore on _LoginStoreBase, Store {
   }
 
   @override
+  void setAlertFacebook(String value) {
+    final _$actionInfo = _$_LoginStoreBaseActionController.startAction(
+        name: '_LoginStoreBase.setAlertFacebook');
+    try {
+      return super.setAlertFacebook(value);
+    } finally {
+      _$_LoginStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 uid: ${uid},
@@ -345,6 +371,7 @@ password: ${password},
 passwordVisible: ${passwordVisible},
 passwordConfirm: ${passwordConfirm},
 dateNasc: ${dateNasc},
+alertFacebook: ${alertFacebook},
 isNameValid: ${isNameValid},
 isEmailValid: ${isEmailValid},
 isPasswordValid: ${isPasswordValid},

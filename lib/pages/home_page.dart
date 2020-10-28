@@ -1,8 +1,7 @@
-import 'package:diariosaude/data/child_data.dart';
+import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/child_store.dart';
-import 'package:diariosaude/store/user_store.dart';
 import 'package:diariosaude/store/vacina_store.dart';
 import 'package:diariosaude/widgets/child_column.dart';
 import 'package:diariosaude/widgets/task_container.dart';
@@ -73,6 +72,26 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: ThemeColors.background,
+      /*appBar: AppBar(
+        title: Text("Diário Saúde"),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              loginStore.signOut();
+              if (!loginStore.loggedIn) {
+                showAlertDialogSair(context);
+              }
+            },
+            icon: Icon(Icons.exit_to_app,
+                color: Colors.white, size: 25.0),
+          )
+        ],
+      ),
+      drawer: Drawer(
+        child: Container(
+          child: Text("teste"),
+        ),
+      ),*/
       body: SafeArea(
         child: Observer(builder: (_) {
           return Column(
@@ -91,9 +110,7 @@ class _HomePageState extends State<HomePage> {
                             onPressed: () {
                               loginStore.signOut();
                               if (!loginStore.loggedIn) {
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (_) => LoginPage()));
+                                showAlertDialogSair(context);
                               }
                             },
                             icon: Icon(Icons.exit_to_app,
@@ -142,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                                     'Bem vindo',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: SizeConfig.of(context).dynamicScaleSize(size: 16),
                                       color: Colors.white,
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -153,7 +170,7 @@ class _HomePageState extends State<HomePage> {
                                     loginStore.currentUser.value.displayName,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
-                                      fontSize: 22.0,
+                                      fontSize: SizeConfig.of(context).dynamicScaleSize(size: 18),
                                       color: Colors.white,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -256,6 +273,37 @@ class _HomePageState extends State<HomePage> {
     disposer();
     super.dispose();
   }
+}
+
+showAlertDialogSair(BuildContext context) {
+  Widget cancelaButton = FlatButton(
+    child: Text("Cancelar"),
+    onPressed:  () {
+      Navigator.of(context).pop();
+    },
+  );
+  Widget sairButton = FlatButton(
+    child: Text("Sair"),
+    onPressed:  () {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+              builder: (_) => LoginPage()));
+    },
+  );
+  AlertDialog alert = AlertDialog(
+    title: Text("Deseja sair realmente do Diário Saúde?"),
+    actions: [
+      cancelaButton,
+      sairButton,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }
 
 String _calculaIdade(DateTime data, DateTime nasc){

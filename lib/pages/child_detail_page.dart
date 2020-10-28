@@ -61,6 +61,13 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24), ),
                     content: Text(vacinas.length > 1 ? plural : singular,
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),),
+                    actions: <Widget>[
+                      FlatButton(
+                      child: Text("Ok"),
+                        onPressed:  () {
+                          Navigator.of(context).pop();
+                        },),
+                    ],
                  )));
     }
   }

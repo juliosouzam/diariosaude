@@ -45,6 +45,9 @@ abstract class _LoginStoreBase with Store {
   @observable
   String dateNasc = "";
 
+  @observable
+  String alertFacebook = "";
+
   @action
   void setName(String value) => name = value;
 
@@ -62,6 +65,9 @@ abstract class _LoginStoreBase with Store {
 
   @action
   void setDateNasc(String value) => dateNasc = value;
+
+  @action
+  void setAlertFacebook(String value) => alertFacebook = value;
 
   @computed
   bool get isNameValid => name.isNotEmpty;
@@ -136,6 +142,14 @@ abstract class _LoginStoreBase with Store {
     try{
       final FacebookLoginResult result = await facebookLogin.logIn(['email']);
       FirebaseUser user;
+      switch (result.status) {
+        case FacebookLoginStatus.cancelledByUser:
+          setAlertFacebook('Usuário Cancelou o Login.');
+          break;
+        case FacebookLoginStatus.error:
+          setAlertFacebook('Erro ao fazer o Login com Facebbok. Tente Novamente');
+          break;
+      }
       if (result.status == FacebookLoginStatus.loggedIn) {
         final AuthCredential credential = FacebookAuthProvider.getCredential(
             accessToken: result.accessToken.token);
@@ -144,7 +158,11 @@ abstract class _LoginStoreBase with Store {
             currentUser = Observable(user);
             loading = false;
             loggedIn = true;
+            print("teste user");
+            print(user);
             return Future.value(true);
+        }).catchError((e){
+          print(e);
         });
 
       }
@@ -238,6 +256,7 @@ abstract class _LoginStoreBase with Store {
   }
 
   Future<void> signOut() async{
+    await facebookLogin.logOut();
     await FirebaseAuth.instance.signOut().then((u){
       currentUser = null;
       userData = Map();

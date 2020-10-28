@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/widgets/image_source_sheet.dart';
@@ -51,7 +52,7 @@ class _AddChildPageState extends State<AddChildPage> {
                     children: <Widget>[
                       Text('Adicionar filho',
                           style: TextStyle(
-                              fontSize: 30.0,
+                              fontSize: SizeConfig.of(context).dynamicScaleSize(size: 26.0),
                               fontWeight: FontWeight.w700,
                               color: ThemeColors.background)),
                       Column(
@@ -96,46 +97,6 @@ class _AddChildPageState extends State<AddChildPage> {
                       )
                     ],
                   ),
-                  SingleChildScrollView(
-                      child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      MyTextField(
-                        label: 'Nome da criança',
-                        onChange: (text) {
-                          childStore.name = text;
-                        },
-                      ),
-                      SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Expanded(
-                            child: DateTimeField(
-                              format: widget.dateFormat,
-                              cursorColor: Colors.white60,
-                              decoration: InputDecoration(
-                                hintText: 'Data de nascimento',
-                                hintStyle: TextStyle(color: Colors.white60),
-                              ),
-                              onChanged: (date) {
-                                childStore.dateBirth = date;
-                              },
-                              onShowPicker: (context, currentValue) {
-                                return showDatePicker(
-                                    context: context,
-                                    firstDate: DateTime(2000),
-                                    initialDate: currentValue ?? DateTime.now(),
-                                    lastDate:
-                                        DateTime(DateTime.now().year + 1));
-                              },
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  )),
                 ],
               ),
             ),
@@ -145,6 +106,41 @@ class _AddChildPageState extends State<AddChildPage> {
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: <Widget>[
+                  MyTextField(
+                    label: 'Nome da criança',
+                    color: Colors.black54,
+                    onChange: (text) {
+                      childStore.name = text;
+                    },
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Expanded(
+                        child: DateTimeField(
+                          format: widget.dateFormat,
+                          cursorColor: Colors.white60,
+                          decoration: InputDecoration(
+                            hintText: 'Data de nascimento',
+                            hintStyle: TextStyle(color: Colors.black54),
+                          ),
+                          onChanged: (date) {
+                            childStore.dateBirth = date;
+                          },
+                          onShowPicker: (context, currentValue) {
+                            return showDatePicker(
+                                context: context,
+                                firstDate: DateTime(2000),
+                                initialDate: currentValue ?? DateTime.now(),
+                                lastDate:
+                                DateTime(DateTime.now().year + 1));
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                   DateTimeField(
                     format: widget.timeFormat,
                     cursorColor: Colors.white60,

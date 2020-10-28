@@ -1,3 +1,4 @@
+
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,11 +18,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Diário Saude',
+      title: 'Diário Saúde',
       theme: ThemeData(
-        primaryColor: Color.fromARGB(255, 8, 77, 110),
+        primaryColor: Color.fromARGB(255, 255, 89, 12),
         cursorColor: Color.fromARGB(255, 8, 77, 110),
-        scaffoldBackgroundColor: Color.fromARGB(255, 8, 77, 110),
+        scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
       ),
       home: LoginPage(),
       localizationsDelegates: [

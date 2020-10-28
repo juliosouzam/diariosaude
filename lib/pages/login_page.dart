@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/components/shared/button.dart';
 import 'package:diariosaude/components/shared/input_text.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 
@@ -45,6 +46,12 @@ class _LoginPageState extends State<LoginPage> {
     });
 
   }
+  /*@override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+  }*/
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,14 +65,16 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               children: <Widget>[
                 FlatButton(
+                  padding: const EdgeInsets.only(bottom: 20.0),
                   onPressed: () {},
                   child: Image.asset(
-                    'assets/images/logo-primary.png',
-                    height: 180.0,
-                    width: 180.0,
+                    'assets/images/CECIS.png',
+                    height: 150.0,
+                    width: 150.0,
                   ),
                 ),
                 Card(
+                  color: Color.fromARGB(100, 255, 110, 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -214,6 +223,12 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Color.fromRGBO(59, 86, 157, 1),
                                 onPressed: () {
                                   loginStore.loginWithFacebook();
+                                  print("testando aki |");
+                                  print(loginStore.alertFacebook);
+                                  if(loginStore.alertFacebook != ""){
+                                    showAlertDialogAlert(context, loginStore.alertFacebook);
+                                    loginStore.setAlertFacebook("");
+                                  }
                                 },
                               ),
                           ],
@@ -257,4 +272,26 @@ class _LoginPageState extends State<LoginPage> {
       duration: Duration(seconds: 2),
     ));
   }
+}
+
+showAlertDialogAlert(BuildContext context, String alertFacebook) {
+  Widget alertButton = FlatButton(
+    child: Text("Ok"),
+    onPressed:  () {
+      Navigator.of(context).pop();
+    },
+  );
+  AlertDialog alert = AlertDialog(
+    title: Text(alertFacebook),
+    actions: [
+      alertButton,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }

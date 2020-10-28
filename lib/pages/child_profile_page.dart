@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:diariosaude/data/child_data.dart';
+import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/child_store.dart';
@@ -89,7 +90,7 @@ class _ChildProfilePage extends State<ChildProfilePage> {
                     children: <Widget>[
                       Text('Editar Perfil',
                           style: TextStyle(
-                              fontSize: 30.0,
+                              fontSize: SizeConfig.of(context).dynamicScaleSize(size: 26.0),
                               fontWeight: FontWeight.w700,
                               color: ThemeColors.background)),
                       Column(
@@ -135,55 +136,6 @@ class _ChildProfilePage extends State<ChildProfilePage> {
                       )
                     ],
                   ),
-                  Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _nomeController,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              suffixIcon: Icon(Icons.account_circle),
-                              hintText: 'Nome',
-                            ),
-                            keyboardType: TextInputType.text,
-                            onChanged: (text){
-                              childStore.name = text;
-                            },
-                          ),
-                          SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: <Widget>[
-                              Expanded(
-                                child: DateTimeField(
-                                  controller: _dateNasciController,
-                                  format: dateFormat,
-                                  cursorColor: Colors.white60,
-                                  decoration: InputDecoration(
-                                    hintText: 'Data de nascimento',
-                                    suffixIcon: Icon(Icons.date_range),
-                                    hintStyle: TextStyle(color: Colors.white60),
-                                  ),
-                                  onChanged: (date) {
-                                    childStore.dateBirth = date;
-                                  },
-                                  onShowPicker: (context, currentValue) {
-                                    return showDatePicker(
-                                        context: context,
-                                        firstDate: DateTime(2000),
-                                        initialDate:
-                                        currentValue ?? childStore.dateBirth,
-                                        lastDate:
-                                        DateTime(DateTime.now().year + 1));
-                                  },
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ))
                 ],
               ),
             ),
@@ -193,6 +145,55 @@ class _ChildProfilePage extends State<ChildProfilePage> {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: <Widget>[
+                      Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              TextFormField(
+                                controller: _nomeController,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  suffixIcon: Icon(Icons.account_circle),
+                                  hintText: 'Nome',
+                                ),
+                                keyboardType: TextInputType.text,
+                                onChanged: (text){
+                                  childStore.name = text;
+                                },
+                              ),
+                              SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: DateTimeField(
+                                      controller: _dateNasciController,
+                                      format: dateFormat,
+                                      cursorColor: Colors.white60,
+                                      decoration: InputDecoration(
+                                        hintText: 'Data de nascimento',
+                                        suffixIcon: Icon(Icons.date_range),
+                                        hintStyle: TextStyle(color: Colors.white60),
+                                      ),
+                                      onChanged: (date) {
+                                        childStore.dateBirth = date;
+                                      },
+                                      onShowPicker: (context, currentValue) {
+                                        return showDatePicker(
+                                            context: context,
+                                            firstDate: DateTime(2000),
+                                            initialDate:
+                                            currentValue ?? childStore.dateBirth,
+                                            lastDate:
+                                            DateTime(DateTime.now().year + 1));
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          )),
                       DateTimeField(
                         controller: _hourNasciController,
                         format: timeFormat,
@@ -219,30 +220,40 @@ class _ChildProfilePage extends State<ChildProfilePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Expanded(
-                              child: TextFormField(
-                                controller: _pesoController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Peso',
-                                ),
-                                keyboardType: TextInputType.text,
-                                onChanged: (text){
-                                  childStore.weight = text;
-                                },
+                              child: Column(
+                                children: <Widget>[
+                                  Text("Peso:"),
+                                  TextFormField(
+                                    controller: _pesoController,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Peso',
+                                    ),
+                                    keyboardType: TextInputType.text,
+                                    onChanged: (text){
+                                      childStore.weight = text;
+                                    },
+                                  ),
+                                ],
                               ),
                           ),
                           SizedBox(width: 40),
                           Expanded(
-                            child: TextFormField(
-                              controller: _alturaController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Altura',
-                              ),
-                              keyboardType: TextInputType.text,
-                              onChanged: (text){
-                                childStore.height = text;
-                              },
+                            child: Column(
+                              children: <Widget>[
+                                Text('Altura:'),
+                                TextFormField(
+                                  controller: _alturaController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Altura',
+                                  ),
+                                  keyboardType: TextInputType.text,
+                                  onChanged: (text){
+                                    childStore.height = text;
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                         ],
