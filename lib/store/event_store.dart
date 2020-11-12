@@ -9,6 +9,9 @@ class EventStore = _EventStoreBase with _$EventStore;
 abstract class _EventStoreBase with Store {
 
   @observable
+  String idFilhoEvent = "";
+
+  @observable
   String nomeEvent = "";
 
   @observable
@@ -30,7 +33,20 @@ abstract class _EventStoreBase with Store {
   ObservableList<EventData> listEventFilter = ObservableList<EventData>();
 
   @observable
+  ObservableList<EventData> listEventFilterFilho = ObservableList<EventData>();
+
+  List<EventData> list = List<EventData>();
+
+  @observable
   bool loading = false;
+
+  @observable
+  int numero = 0;
+
+  bool eventChange = true;
+
+  @action
+  void setIdFilhoEvent(String value) => idFilhoEvent = value;
 
   @action
   void setNomeEvent(String value) => nomeEvent = value;
@@ -49,6 +65,12 @@ abstract class _EventStoreBase with Store {
     tipoEvent = value ? tipo : null;
   }
 
+  @action
+  void setNumero(int value) => numero = value;
+
+
+  @computed
+  bool get isIdFilhoValid => idFilhoEvent.isNotEmpty;
 
   @computed
   bool get isNomeValid => nomeEvent.isNotEmpty;
@@ -73,16 +95,17 @@ abstract class _EventStoreBase with Store {
       await Firestore.instance
           .collection("users")
           .document(uId)
-          .collection("children")
-          .document(e.cid)
+          // .collection("children")
+          // .document(e.cid)
           .collection("eventos")
           .add(e.toMap())
           .then((doc) {
+            eventChange = true;
           }).catchError((e){
          print(e);
       });
       loading = false;
-      getEventos(uId, e.cid);
+      getEventos(uId);
       return true;
     } catch(error){
       loading = false;
@@ -99,12 +122,12 @@ abstract class _EventStoreBase with Store {
       await Firestore.instance
           .collection("users")
           .document(uId)
-          .collection("children")
-          .document(e.cid)
+          //.collection("children")
+          //.document(e.cid)
           .collection("eventos")
           .document(e.eid)
           .updateData(e.toMap()).then((e){
-
+            eventChange = true;
       }).catchError((e){
         print(e);
       });
@@ -115,7 +138,7 @@ abstract class _EventStoreBase with Store {
       horarioEvent = "";
       descricaoEvent = "";
       tipoEvent = "";
-      getEventos(uId, e.cid);
+      getEventos(uId);
       return true;
     } catch(error){
       loading = false;
@@ -132,12 +155,12 @@ abstract class _EventStoreBase with Store {
       await Firestore.instance
           .collection("users")
           .document(uId)
-          .collection("children")
-          .document(e.cid)
+          // .collection("children")
+          // .document(e.cid)
           .collection("eventos")
           .document(e.eid)
           .delete().then((e){
-
+            eventChange = true;
       }).catchError((e){
         print(e);
       });
@@ -148,7 +171,7 @@ abstract class _EventStoreBase with Store {
       horarioEvent = "";
       descricaoEvent = "";
       tipoEvent = "";
-      getEventos(uId, e.cid);
+      getEventos(uId);
       return true;
     } catch(error){
       loading = false;
@@ -157,30 +180,125 @@ abstract class _EventStoreBase with Store {
 
   }
 
-  Future<bool> getEventos(String uId, String cId) async {
-    try{
-      QuerySnapshot query = await Firestore.instance
-          .collection("users")
-          .document(uId)
-          .collection("children")
-          .document(cId)
-          .collection("eventos")
-          .getDocuments();
+  Future<bool> getEventos(String uId) async {
+    if(eventChange){
+      try{
+        QuerySnapshot query = await Firestore.instance
+            .collection("users")
+            .document(uId)
+        // .collection("children")
+        // .document(cId)
+            .collection("eventos")
+            .getDocuments().then((e){
+              eventChange = false;
+              return e;
+        });
 
-      listEvent = query.documents.map((doc) => EventData.fromDocument(doc)).toList().asObservable();
-      listEventFilter = listEvent;
+        listEvent = query.documents.map((doc) => EventData.fromDocument(doc)).toList().asObservable();
+        /*listEventFilter = listEvent;
+        DateTime data = DateTime.now();
+        listEventFilter = listEventFilter.where((filter) => filter.dateEvent.isAfter(DateTime.now()) ||
+            (filter.dateEvent.month == data.month
+                && filter.dateEvent.day == data.day
+                && filter.dateEvent.year == data.year) ).toList().asObservable();*/
+        return true;
+      }catch(error){
+        return false;
+      }
+    }else{
+      return false;
+    }
+  }
+
+  Future<bool> getEventosProximos(String uId) async {
+    try{
+      list = listEvent;
       DateTime data = DateTime.now();
-      listEventFilter = listEventFilter.where((filter) => filter.dateEvent.isAfter(DateTime.now()) ||
+      list = list.where((filter) =>
+      filter.dateEvent.isAfter(DateTime.now()) ||
           (filter.dateEvent.month == data.month
               && filter.dateEvent.day == data.day
-              && filter.dateEvent.year == data.year) ).toList().asObservable();
+              && filter.dateEvent.year == data.year)).toList().asObservable();
+      list.sort((a, b) => a.dateEvent.isAfter(b.dateEvent) ? 1 : -1);
+      listEventFilter = list;
+      return true;
+    }catch(error){
+    return false;
+    }
+  }
+
+  Future<bool> getEventosTodos(String uId) async {
+    try{
+      list = listEvent;
+      list.sort((a, b) => a.dateEvent.isAfter(b.dateEvent) ? -1 : 1);
+      listEventFilter = list;
       return true;
     }catch(error){
       return false;
     }
-
   }
 
+  Future<bool> getEventosVacina(String uId) async {
+    try{
+      list = listEvent;
+      list = list.where((filter) =>
+      filter.typeEvent.compareTo("vacina") == 0).toList().asObservable();
+      list.sort((a, b) => a.dateEvent.isAfter(b.dateEvent) ? -1 : 1);
+      listEventFilter = list;
+      return true;
+    }catch(error){
+      return false;
+    }
+  }
+
+  Future<bool> getEventosConsulta(String uId) async {
+    try{
+      list = listEvent;
+      list = list.where((filter) =>
+      filter.typeEvent.compareTo("consulta") == 0).toList().asObservable();
+      list.sort((a, b) => a.dateEvent.isAfter(b.dateEvent) ? -1 : 1);
+      listEventFilter = list;
+      return true;
+    }catch(error){
+      return false;
+    }
+  }
+
+  Future<bool> getEventosRotina(String uId) async {
+      try{
+        list = listEvent;
+        list = list.where((filter) =>
+            /*(filter.dateEvent.isAfter(DateTime.now()) && filter.typeEvent.compareTo("rotina") == 0) ||
+            (filter.dateEvent.month == data.month
+                && filter.dateEvent.day == data.day
+                && filter.dateEvent.year == data.year)
+            && filter.typeEvent.compareTo("rotina") == 0).toList().asObservable();*/
+        filter.typeEvent.compareTo("rotina") == 0).toList().asObservable();
+        list.sort((a, b) => a.dateEvent.isAfter(b.dateEvent) ? -1 : 1);
+        listEventFilter = list;
+        return true;
+      }catch(error){
+        return false;
+      }
+  }
+
+  Future<bool> getEventosFilho(String uId, String cId) async {
+    try{
+      list = listEvent;
+      DateTime data = DateTime.now();
+      list = list.where((filter) =>
+      (filter.dateEvent.isAfter(DateTime.now()) && filter.cid.compareTo(cId) == 0) ||
+            (filter.dateEvent.month == data.month
+                && filter.dateEvent.day == data.day
+                && filter.dateEvent.year == data.year)
+            && filter.cid.compareTo(cId) == 0).toList().asObservable();
+      list.sort((a, b) => a.dateEvent.isAfter(b.dateEvent) ? 1 : -1);
+      listEventFilterFilho = list;
+      return true;
+    }catch(error){
+      return false;
+    }
+  }
 
 
 }

@@ -1,9 +1,12 @@
 import 'package:diariosaude/data/child_data.dart';
 import 'package:diariosaude/data/event_data.dart';
+import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/child_profile_page.dart';
 import 'package:diariosaude/pages/event_edit_page.dart';
-import 'package:diariosaude/pages/event_page.dart';
+import 'package:diariosaude/pages/home_page.dart';
+import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
+import 'package:diariosaude/widgets/custom_drawer.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +15,9 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class EventDetailPage extends StatelessWidget {
   EventData eventData;
-  ChildData childData;
-  EventDetailPage(this.eventData, this.childData);
+  EventDetailPage(this.eventData);
   DateFormat dateFormat = DateFormat('dd-MM-yyyy');
-
+  List<ChildData> childData = List();
   Text subheading(String title) {
     return Text(
       title,
@@ -30,7 +32,7 @@ class EventDetailPage extends StatelessWidget {
   static CircleAvatar editIcon() {
     return CircleAvatar(
       radius: 25.0,
-      backgroundColor: ThemeColors.secondary,
+      backgroundColor: ThemeColors.colorButtonAdd,
       child: Icon(
         Icons.edit,
         size: 20.0,
@@ -42,30 +44,36 @@ class EventDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    childData = childStore.listChild.where((element) => eventData.cid == element.cid).toList();
     return Scaffold(
       backgroundColor: ThemeColors.background,
+      appBar: AppBar(
+        title: Text("Diário Saúde"),
+        centerTitle: true,
+        elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              loginStore.signOut();
+              if (!loginStore.loggedIn) {
+                showAlertDialogSair(context);
+              }
+            },
+            icon: Icon(Icons.exit_to_app,
+                color: Colors.white, size: 25.0),
+          )
+        ],
+      ),
+      drawer: CustomDrawer(0),
       body: SafeArea(
         child: Column(
           children: <Widget>[
             TopContainer(
-              height: 200,
-              width: width,
+              height: SizeConfig.of(context).dynamicScaleSize(size: 150.0),
+              width: SizeConfig.of(context).dynamicScaleSize(size: width),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Container(),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: Icon(Icons.arrow_back,
-                              color: Colors.white, size: 25.0),
-                        )
-                      ],
-                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 0, vertical: 0.0),
@@ -74,7 +82,7 @@ class EventDetailPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           CircularPercentIndicator(
-                            radius: 90.0,
+                            radius: SizeConfig.of(context).dynamicScaleSize(size: 90.0),
                             lineWidth: 5.0,
                             animation: true,
                             percent: 0.75,
@@ -86,25 +94,25 @@ class EventDetailPage extends StatelessWidget {
                                   onTap: (){
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
-                                            builder: (_) => ChildProfilePage(childData.cid)));
+                                            builder: (_) => ChildProfilePage(childData[0].cid)));
                                   },
                                   child: CircleAvatar(
                                     backgroundColor: ThemeColors.primaryVariant,
-                                    radius: 35.0,
-                                    backgroundImage: NetworkImage(childData.photo),
+                                    radius: SizeConfig.of(context).dynamicScaleSize(size: 35.0),
+                                    backgroundImage: NetworkImage(childData[0].photo),
                                   ),
                                 ),
-                                tag: childData.name),
+                                tag: childData[0].name),
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Container(
                                 child: Text(
-                                  childData.name,
+                                  childData[0].name,
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
-                                    fontSize: 22.0,
+                                    fontSize: SizeConfig.of(context).dynamicScaleSize(size: 22.0),
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -139,7 +147,7 @@ class EventDetailPage extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              EventEditPage(eventData, childData.cid)));
+                                              EventEditPage(eventData, childData[0].cid)));
                                 },
                                 child: editIcon(),
                               ),

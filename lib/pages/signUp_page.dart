@@ -1,4 +1,5 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/store/login_store.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/components/shared/button.dart';
@@ -53,11 +54,12 @@ class _SignUpPageState extends State<SignUpPage> {
                 FlatButton(
                   onPressed: () {},
                   child: Image.asset(
-                    'assets/images/logo-primary.png',
-                    height: 180.0,
-                    width: 180.0,
+                    'assets/images/CECIS.png',
+                    height: SizeConfig.of(context).dynamicScaleSize(size: 150),
+                    width: SizeConfig.of(context).dynamicScaleSize(size: 150),
                   ),
                 ),
+                SizedBox(height: 10),
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

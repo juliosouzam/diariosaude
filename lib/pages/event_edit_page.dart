@@ -1,14 +1,14 @@
 import 'package:diariosaude/data/event_data.dart';
-import 'package:diariosaude/pages/child_detail_page.dart';
+import 'package:diariosaude/media/media_query.dart';
+import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
-import 'package:diariosaude/store/event_store.dart';
+import 'package:diariosaude/widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:mobx/mobx.dart';
 
 
 class EventEditPage extends StatefulWidget {
@@ -27,15 +27,27 @@ class _EventEditPageState extends State<EventEditPage> {
   final String cid;
   EventData eventData;
   _EventEditPageState(this.eventData, this.cid);
+  List<DropdownMenuItem<String>> listDrop = [];
+  String nomeFilho = "";
+
+  void loadData() {
+    listDrop = [];
+    childStore.listChild.forEach((element) {
+      listDrop.add(new DropdownMenuItem(
+        child: new Text(element.name),
+        value: element.cid,
+      ));
+    });
+  }
 
   static CircleAvatar removeIcon() {
     return CircleAvatar(
       radius: 25.0,
-      backgroundColor: ThemeColors.secondary,
+      backgroundColor: Colors.white,
       child: Icon(
         Icons.delete,
         size: 20.0,
-        color: Colors.white,
+        color: ThemeColors.colorButtonAdd,
       ),
     );
   }
@@ -60,6 +72,7 @@ class _EventEditPageState extends State<EventEditPage> {
     eventStore.setHorarioEvent(eventData.horarioEvent);
     eventStore.setDescricaoEvent(eventData.descriptionEvent);
     eventStore.seTipoEvent(true, eventData.typeEvent);
+    nomeFilho = eventData.cid;
     super.initState();
   }
 
@@ -68,35 +81,44 @@ class _EventEditPageState extends State<EventEditPage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    loadData();
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: ThemeColors.background,
+      appBar: AppBar(
+        title: Text("Diário Saúde"),
+        centerTitle: true,
+        elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              loginStore.signOut();
+              if (!loginStore.loggedIn) {
+                showAlertDialogSair(context);
+              }
+            },
+            icon: Icon(Icons.exit_to_app,
+                color: Colors.white, size: 25.0),
+          )
+        ],
+      ),
+      drawer: CustomDrawer(0),
       body: SafeArea(
         child: Column(
           children: <Widget>[
             TopContainer(
               padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
-              width: width,
+              width: SizeConfig.of(context).dynamicScaleSize(size: width),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon:
-                    Icon(Icons.arrow_back, color: Colors.white, size: 25.0),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
                   Row(
                     //mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text('Editar evento',
                           style: TextStyle(
-                              fontSize: 30.0,
+                              fontSize: SizeConfig.of(context).dynamicScaleSize(size: 30.0),
                               fontWeight: FontWeight.w700,
                               color: ThemeColors.background)),
                       GestureDetector(
@@ -107,67 +129,7 @@ class _EventEditPageState extends State<EventEditPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 15),
-                  Form(
-                    key: _formKey,
-                    child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Observer(builder: (_){
-                              return TextFormField(
-                                controller: _nomeController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  icon: Icon(Icons.title),
-                                  hintText: 'Título',
-                                ),
-                                validator: (value){
-                                  if(eventStore.isNomeValid){
-                                    return null;
-                                  }
-                                  return "Campo Título é Obrigatório";
-                                },
-                                onChanged: eventStore.setNomeEvent,
-                                enabled: !eventStore.loading,
-                              );
-                            }),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: <Widget>[
-                                Expanded(
-                                  child: DateTimeField(
-                                    controller: _dateEventController,
-                                    format: widget.dateFormat,
-                                    onChanged: (value){
-                                      eventStore.setDateEvent(value);
-                                    },
-                                    validator: (value){
-                                      if(eventStore.isDateValid){
-                                        return null;
-                                      }
-                                      return "Campo Data é Obrigatório!";
-                                    },
-                                    cursorColor: Colors.white60,
-                                    decoration: InputDecoration(
-                                      hintText: 'Data',
-                                      hintStyle: TextStyle(color: Colors.white60),
-                                    ),
-                                    onShowPicker: (context, currentValue) {
-                                      return showDatePicker(
-                                          context: context,
-                                          firstDate: DateTime(1990),
-                                          initialDate: currentValue ?? DateTime.now(),
-                                          lastDate: DateTime(2100));
-                                    },
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        )),
-                  )
+                  SizedBox(height: 10),
                 ],
               ),
             ),
@@ -176,6 +138,80 @@ class _EventEditPageState extends State<EventEditPage> {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: <Widget>[
+                      SizedBox(height: 20),
+                      DropdownButtonFormField(
+                        items: listDrop,
+                        hint: Text("Escolha um(a) Filho(a)"),
+                        value: nomeFilho,
+                        onChanged: (value) => eventStore.setIdFilhoEvent("$value"),
+                        validator: (value){
+                          if(eventStore.isIdFilhoValid){
+                            return null;
+                          }
+                          return "Selecione um(a) Filho(a) ";
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      Form(
+                        key: _formKey,
+                        child: Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Observer(builder: (_){
+                                  return TextFormField(
+                                    controller: _nomeController,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      icon: Icon(Icons.title),
+                                      hintText: 'Título',
+                                    ),
+                                    validator: (value){
+                                      if(eventStore.isNomeValid){
+                                        return null;
+                                      }
+                                      return "Campo Título é Obrigatório";
+                                    },
+                                    onChanged: eventStore.setNomeEvent,
+                                    enabled: !eventStore.loading,
+                                  );
+                                }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: DateTimeField(
+                                        controller: _dateEventController,
+                                        format: widget.dateFormat,
+                                        onChanged: (value){
+                                          eventStore.setDateEvent(value);
+                                        },
+                                        validator: (value){
+                                          if(eventStore.isDateValid){
+                                            return null;
+                                          }
+                                          return "Campo Data é Obrigatório!";
+                                        },
+                                        cursorColor: Colors.white60,
+                                        decoration: InputDecoration(
+                                          hintText: 'Data',
+                                          hintStyle: TextStyle(color: Colors.white60),
+                                        ),
+                                        onShowPicker: (context, currentValue) {
+                                          return showDatePicker(
+                                              context: context,
+                                              firstDate: DateTime(1990),
+                                              initialDate: currentValue ?? DateTime.now(),
+                                              lastDate: DateTime(2100));
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            )),
+                      ),
                       DateTimeField(
                         controller: _hourEventController,
                         onChanged: (value){
@@ -262,6 +298,16 @@ class _EventEditPageState extends State<EventEditPage> {
                                     label: Text("Consulta"),
                                   );
                                 }),
+                                Observer(builder: (_){
+                                  return InputChip(
+                                    key: ObjectKey('rotina'),
+                                    selected: !!(eventStore.tipoEvent == "rotina"),
+                                    onSelected: (value){
+                                      eventStore.seTipoEvent(value, "rotina");
+                                    },
+                                    label: Text("Rotina"),
+                                  );
+                                }),
                               ],
                             ),
                           ],
@@ -271,8 +317,8 @@ class _EventEditPageState extends State<EventEditPage> {
                   ),
                 )),
             Container(
-              height: 80,
-              width: width,
+              height: SizeConfig.of(context).dynamicScaleSize(size: 80.0),
+              width: SizeConfig.of(context).dynamicScaleSize(size: width),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -285,6 +331,7 @@ class _EventEditPageState extends State<EventEditPage> {
                           eventData.horarioEvent = eventStore.horarioEvent;
                           eventData.descriptionEvent = eventStore.descricaoEvent;
                           eventData.typeEvent = eventStore.tipoEvent;
+                          eventData.cid = eventStore.idFilhoEvent;
 
                           bool result = false;
                           result = await eventStore.updateEventData(eventData,
@@ -316,9 +363,9 @@ class _EventEditPageState extends State<EventEditPage> {
                         ),
                         alignment: Alignment.center,
                         margin: EdgeInsets.fromLTRB(20, 10, 20, 20),
-                        width: width - 40,
+                        width: SizeConfig.of(context).dynamicScaleSize(size: width - 40.0),
                         decoration: BoxDecoration(
-                          color: ThemeColors.success,
+                          color: Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
@@ -340,6 +387,7 @@ class _EventEditPageState extends State<EventEditPage> {
       backgroundColor: Colors.green,
       duration: Duration(seconds: 2),
     ));
+    Navigator.of(context).pop();
     Navigator.of(context).pop();
   }
 

@@ -9,6 +9,13 @@ part of 'event_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$EventStore on _EventStoreBase, Store {
+  Computed<bool> _$isIdFilhoValidComputed;
+
+  @override
+  bool get isIdFilhoValid =>
+      (_$isIdFilhoValidComputed ??= Computed<bool>(() => super.isIdFilhoValid,
+              name: '_EventStoreBase.isIdFilhoValid'))
+          .value;
   Computed<bool> _$isNomeValidComputed;
 
   @override
@@ -44,6 +51,21 @@ mixin _$EventStore on _EventStoreBase, Store {
       (_$istipoValidComputed ??= Computed<bool>(() => super.istipoValid,
               name: '_EventStoreBase.istipoValid'))
           .value;
+
+  final _$idFilhoEventAtom = Atom(name: '_EventStoreBase.idFilhoEvent');
+
+  @override
+  String get idFilhoEvent {
+    _$idFilhoEventAtom.reportRead();
+    return super.idFilhoEvent;
+  }
+
+  @override
+  set idFilhoEvent(String value) {
+    _$idFilhoEventAtom.reportWrite(value, super.idFilhoEvent, () {
+      super.idFilhoEvent = value;
+    });
+  }
 
   final _$nomeEventAtom = Atom(name: '_EventStoreBase.nomeEvent');
 
@@ -150,6 +172,23 @@ mixin _$EventStore on _EventStoreBase, Store {
     });
   }
 
+  final _$listEventFilterFilhoAtom =
+      Atom(name: '_EventStoreBase.listEventFilterFilho');
+
+  @override
+  ObservableList<EventData> get listEventFilterFilho {
+    _$listEventFilterFilhoAtom.reportRead();
+    return super.listEventFilterFilho;
+  }
+
+  @override
+  set listEventFilterFilho(ObservableList<EventData> value) {
+    _$listEventFilterFilhoAtom.reportWrite(value, super.listEventFilterFilho,
+        () {
+      super.listEventFilterFilho = value;
+    });
+  }
+
   final _$loadingAtom = Atom(name: '_EventStoreBase.loading');
 
   @override
@@ -162,6 +201,21 @@ mixin _$EventStore on _EventStoreBase, Store {
   set loading(bool value) {
     _$loadingAtom.reportWrite(value, super.loading, () {
       super.loading = value;
+    });
+  }
+
+  final _$numeroAtom = Atom(name: '_EventStoreBase.numero');
+
+  @override
+  int get numero {
+    _$numeroAtom.reportRead();
+    return super.numero;
+  }
+
+  @override
+  set numero(int value) {
+    _$numeroAtom.reportWrite(value, super.numero, () {
+      super.numero = value;
     });
   }
 
@@ -190,6 +244,17 @@ mixin _$EventStore on _EventStoreBase, Store {
 
   final _$_EventStoreBaseActionController =
       ActionController(name: '_EventStoreBase');
+
+  @override
+  void setIdFilhoEvent(String value) {
+    final _$actionInfo = _$_EventStoreBaseActionController.startAction(
+        name: '_EventStoreBase.setIdFilhoEvent');
+    try {
+      return super.setIdFilhoEvent(value);
+    } finally {
+      _$_EventStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setNomeEvent(String value) {
@@ -247,8 +312,20 @@ mixin _$EventStore on _EventStoreBase, Store {
   }
 
   @override
+  void setNumero(int value) {
+    final _$actionInfo = _$_EventStoreBaseActionController.startAction(
+        name: '_EventStoreBase.setNumero');
+    try {
+      return super.setNumero(value);
+    } finally {
+      _$_EventStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
+idFilhoEvent: ${idFilhoEvent},
 nomeEvent: ${nomeEvent},
 dateEvent: ${dateEvent},
 horarioEvent: ${horarioEvent},
@@ -256,7 +333,10 @@ descricaoEvent: ${descricaoEvent},
 tipoEvent: ${tipoEvent},
 listEvent: ${listEvent},
 listEventFilter: ${listEventFilter},
+listEventFilterFilho: ${listEventFilterFilho},
 loading: ${loading},
+numero: ${numero},
+isIdFilhoValid: ${isIdFilhoValid},
 isNomeValid: ${isNomeValid},
 isDateValid: ${isDateValid},
 isHorarioValid: ${isHorarioValid},

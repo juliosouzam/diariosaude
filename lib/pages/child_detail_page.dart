@@ -1,12 +1,13 @@
 import 'package:diariosaude/data/child_data.dart';
 import 'package:diariosaude/data/vacina_data.dart';
+import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/child_profile_page.dart';
 import 'package:diariosaude/pages/event_detail_page.dart';
 import 'package:diariosaude/pages/event_page.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
-import 'package:diariosaude/store/event_store.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
+import 'package:diariosaude/widgets/custom_drawer.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:diariosaude/widgets/top_container.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +15,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-
-final EventStore eventStore = EventStore();
 
 class ChildDetailPage extends StatefulWidget {
   final String name;
@@ -39,6 +38,18 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
   String intervalo;
   List<VacinaData> vacinas;
   List<String> nomeVacinas;
+
+  static CircleAvatar addIcon() {
+    return CircleAvatar(
+      radius: 25.0,
+      backgroundColor: ThemeColors.colorButtonAdd,
+      child: Icon(
+        Icons.add_circle,
+        size: 20.0,
+        color: Colors.white,
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -76,7 +87,8 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     disposer = autorun((_) {
-      eventStore.getEventos(loginStore.currentUser.value.uid, widget.cId);
+      eventStore.getEventos(loginStore.currentUser.value.uid);
+      eventStore.getEventosFilho(loginStore.currentUser.value.uid, childData.cid);
     });
 
   }
@@ -110,28 +122,33 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
 
     return Scaffold(
       backgroundColor: ThemeColors.background,
+      appBar: AppBar(
+        title: Text("Diário Saúde"),
+        centerTitle: true,
+        elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              loginStore.signOut();
+              if (!loginStore.loggedIn) {
+                showAlertDialogSair(context);
+              }
+            },
+            icon: Icon(Icons.exit_to_app,
+                color: Colors.white, size: 25.0),
+          )
+        ],
+      ),
+      drawer: CustomDrawer(0),
       body: SafeArea(
         child: Column(
           children: <Widget>[
             TopContainer(
-              height: 200,
-              width: width,
+              height: SizeConfig.of(context).dynamicScaleSize(size: 150),
+              width: SizeConfig.of(context).dynamicScaleSize(size: width),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Container(),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: Icon(Icons.arrow_back,
-                              color: Colors.white, size: 25.0),
-                        )
-                      ],
-                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 0, vertical: 0.0),
@@ -140,7 +157,7 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           CircularPercentIndicator(
-                            radius: 90.0,
+                            radius: SizeConfig.of(context).dynamicScaleSize(size: 90),
                             lineWidth: 5.0,
                             animation: true,
                             percent: 0.75,
@@ -156,7 +173,7 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                                   },
                                   child: CircleAvatar(
                                     backgroundColor: ThemeColors.primaryVariant,
-                                    radius: 35.0,
+                                    radius: SizeConfig.of(context).dynamicScaleSize(size: 35),
                                     backgroundImage: NetworkImage(widget.image),
                                   ),
                                 ),
@@ -170,7 +187,7 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                                   widget.name,
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
-                                    fontSize: 22.0,
+                                    fontSize: SizeConfig.of(context).dynamicScaleSize(size: 22),
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -181,7 +198,7 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                                   widget.age,
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
-                                    fontSize: 16.0,
+                                    fontSize: SizeConfig.of(context).dynamicScaleSize(size: 16),
                                     color: Colors.white,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -213,29 +230,26 @@ class _ChildDetailPageState extends State<ChildDetailPage> {
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              CreateNewTaskPage(widget.cId)));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CreateNewTaskPage()),
+                                  );
                                 },
-                                child: calendarIcon(),
+                                child: addIcon(),
                               ),
                             ],
                           ),
                           Observer(builder: (_){
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: eventStore.listEventFilter.map((event){
+                              children: eventStore.listEventFilterFilho.map((event){
                                 return GestureDetector(
                                   onTap: (){
-                                    ChildData c = ChildData();
-                                    c.photo = widget.image;
-                                    c.cid = widget.cId;
-                                    c.name = widget.name;
                                     Navigator.push(context, MaterialPageRoute(
-                                            builder: (context) => EventDetailPage(event, c)));
+                                            builder: (context) => EventDetailPage(event)));
                                   },
                                   child: TaskContainer(
+                                        tipo: event.typeEvent,
                                         title: event.nameEvent,
                                         subtitle: event.dateEvent.day.toString() + "-" +
                                                   event.dateEvent.month.toString() +"-" +

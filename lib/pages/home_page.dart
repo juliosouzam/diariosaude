@@ -2,8 +2,10 @@ import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/add_child_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
 import 'package:diariosaude/store/child_store.dart';
+import 'package:diariosaude/store/event_store.dart';
 import 'package:diariosaude/store/vacina_store.dart';
 import 'package:diariosaude/widgets/child_column.dart';
+import 'package:diariosaude/widgets/custom_drawer.dart';
 import 'package:diariosaude/widgets/task_container.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
@@ -14,6 +16,7 @@ import 'package:diariosaude/widgets/top_container.dart';
 
 final ChildStore childStore = ChildStore();
 final VacinaStore vacinaStore = VacinaStore();
+final EventStore eventStore = EventStore();
 
 class HomePage extends StatefulWidget {
   @override
@@ -45,7 +48,7 @@ class _HomePageState extends State<HomePage> {
   static CircleAvatar addIcon() {
     return CircleAvatar(
       radius: 25.0,
-      backgroundColor: ThemeColors.secondary,
+      backgroundColor: ThemeColors.colorButtonAdd,
       child: Icon(
         Icons.add_circle,
         size: 20.0,
@@ -72,8 +75,10 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: ThemeColors.background,
-      /*appBar: AppBar(
+      appBar: AppBar(
         title: Text("Diário Saúde"),
+        centerTitle: true,
+        elevation: 0.0,
         actions: <Widget>[
           IconButton(
             onPressed: () {
@@ -87,37 +92,17 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      drawer: Drawer(
-        child: Container(
-          child: Text("teste"),
-        ),
-      ),*/
+      drawer: CustomDrawer(1),
       body: SafeArea(
         child: Observer(builder: (_) {
           return Column(
             children: <Widget>[
               TopContainer(
-                height: 200,
-                width: width,
+                height: SizeConfig.of(context).dynamicScaleSize(size: 150),
+                width: SizeConfig.of(context).dynamicScaleSize(size: width),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Container(),
-                          IconButton(
-                            onPressed: () {
-                              loginStore.signOut();
-                              if (!loginStore.loggedIn) {
-                                showAlertDialogSair(context);
-                              }
-                            },
-                            icon: Icon(Icons.exit_to_app,
-                                color: Colors.white, size: 25.0),
-                          )
-                        ],
-                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 0, vertical: 0.0),
@@ -227,36 +212,6 @@ class _HomePageState extends State<HomePage> {
                             }).toList(),
                           );
                       }),
-                      Container(
-                        color: Colors.transparent,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            subheading('Próximos eventos'),
-                            SizedBox(height: 5.0),
-                            TaskContainer(
-                              title: 'Vacina',
-                              subtitle:
-                                  'Dia 01 de junho, dia da vacina do Antônio Felipe',
-                              boxColor: Color.fromARGB(255, 185, 232, 234),
-                            ),
-                            TaskContainer(
-                              title: 'Pediatra',
-                              subtitle:
-                                  'Dia 15 de julho, levar a Angelica Silva à pediatra',
-                              boxColor: Color.fromARGB(255, 185, 232, 234),
-                            ),
-                            TaskContainer(
-                              title: 'Consulta médica',
-                              subtitle:
-                                  'Dia 28 de maio, levar Fernanda Souza para a consulta médica',
-                              boxColor: Color.fromARGB(255, 185, 232, 234),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),

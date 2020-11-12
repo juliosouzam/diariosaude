@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/home_page.dart';
 import 'package:diariosaude/pages/login_page.dart';
+import 'package:diariosaude/widgets/custom_drawer.dart';
 import 'package:diariosaude/widgets/image_source_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
@@ -31,22 +32,33 @@ class _AddChildPageState extends State<AddChildPage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: ThemeColors.background,
+      appBar: AppBar(
+        title: Text("Diário Saúde"),
+        centerTitle: true,
+        elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              loginStore.signOut();
+              if (!loginStore.loggedIn) {
+                showAlertDialogSair(context);
+              }
+            },
+            icon: Icon(Icons.exit_to_app,
+                color: Colors.white, size: 25.0),
+          )
+        ],
+      ),
+      drawer: CustomDrawer(2),
       body: SafeArea(
         child: Column(
           children: <Widget>[
             TopContainer(
               padding: EdgeInsets.all(10),
-              width: width,
+              width: SizeConfig.of(context).dynamicScaleSize(size: width),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon:
-                        Icon(Icons.arrow_back, color: Colors.white, size: 25.0),
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -58,7 +70,7 @@ class _AddChildPageState extends State<AddChildPage> {
                       Column(
                         children: <Widget>[
                           CircularPercentIndicator(
-                            radius: 90.0,
+                            radius: SizeConfig.of(context).dynamicScaleSize(size: 90.0),
                             lineWidth: 5.0,
                             animation: true,
                             percent: 0.75,
@@ -68,9 +80,12 @@ class _AddChildPageState extends State<AddChildPage> {
                             backgroundColor: ThemeColors.primary,
                             center: CircleAvatar(
                               backgroundColor: ThemeColors.primaryVariant,
-                              radius: 35.0,
+                              radius: SizeConfig.of(context).dynamicScaleSize(size: 35.0),
                               backgroundImage: _image != null
-                                  ? Image.file(_image, width: 150, height: 150)
+                                  ? Image.file(_image,
+                                      width: SizeConfig.of(context).dynamicScaleSize(size: 150.0),
+                                      height: SizeConfig.of(context).dynamicScaleSize(size: 150.0),
+                                    )
                                       .image
                                   : AssetImage('assets/images/avatar.png'),
                             ),

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class TaskContainer extends StatelessWidget {
+  final String tipo;
   final String title;
   final String subtitle;
   final Color boxColor;
 
   TaskContainer({
+    this.tipo = "",
     this.title,
     this.subtitle,
     this.boxColor,
@@ -20,10 +22,17 @@ class TaskContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
+            tipo,
+            style: TextStyle(
+              fontSize: tipo == "" ? 0.0 : 18.0,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          Text(
             title,
             style: TextStyle(
               fontSize: 16.0,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
             ),
           ),
           Padding(

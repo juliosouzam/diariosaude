@@ -1,6 +1,7 @@
 import 'package:diariosaude/data/event_data.dart';
-import 'package:diariosaude/pages/child_detail_page.dart';
+import 'package:diariosaude/media/media_query.dart';
 import 'package:diariosaude/pages/login_page.dart';
+import 'package:diariosaude/widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 import 'package:diariosaude/widgets/top_container.dart';
@@ -8,25 +9,33 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
+import 'home_page.dart';
+
 
 class CreateNewTaskPage extends StatefulWidget {
-  final String cId;
-  CreateNewTaskPage(this.cId);
   final dateFormat = DateFormat('dd-MM-yyyy');
   final timeFormat = DateFormat('HH:mm');
 
   @override
-  _CreateNewTaskPageState createState() => _CreateNewTaskPageState(cId);
+  _CreateNewTaskPageState createState() => _CreateNewTaskPageState();
 }
 
 class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
 
-  final String cid;
-  _CreateNewTaskPageState(this.cid);
-
   final _horarioController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  List<DropdownMenuItem<String>> listDrop = [];
+
+  void loadData() {
+    listDrop = [];
+    childStore.listChild.forEach((element) {
+      listDrop.add(new DropdownMenuItem(
+        child: new Text(element.name),
+        value: element.cid,
+      ));
+    });
+  }
 
   @override
   void initState() {
@@ -34,7 +43,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
     eventStore.setDateEvent(null);
     eventStore.setHorarioEvent("");
     eventStore.setDescricaoEvent("");
-    eventStore.seTipoEvent(true, "");
+    // eventStore.seTipoEvent(true, "");
     super.initState();
   }
 
@@ -43,8 +52,27 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    loadData();
     return Scaffold(
       key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text("Diário Saúde"),
+        centerTitle: true,
+        elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              loginStore.signOut();
+              if (!loginStore.loggedIn) {
+                showAlertDialogSair(context);
+              }
+            },
+            icon: Icon(Icons.exit_to_app,
+                color: Colors.white, size: 25.0),
+          )
+        ],
+      ),
+      drawer: CustomDrawer(3),
       backgroundColor: ThemeColors.background,
       body: SafeArea(
         child: Column(
@@ -55,85 +83,17 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon:
-                    Icon(Icons.arrow_back, color: Colors.white, size: 25.0),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Text('Novo evento',
                           style: TextStyle(
-                              fontSize: 30.0,
+                              fontSize: SizeConfig.of(context).dynamicScaleSize(size: 30.0),
                               fontWeight: FontWeight.w700,
                               color: ThemeColors.background)),
                     ],
                   ),
                   SizedBox(height: 15),
-                  Form(
-                    key: _formKey,
-                    child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Observer(builder: (_){
-                              return TextFormField(
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  icon: Icon(Icons.title),
-                                  hintText: 'Título',
-                                ),
-                                validator: (value){
-                                  if(eventStore.isNomeValid){
-                                    return null;
-                                  }
-                                  return "Campo Título é Obrigatório";
-                                },
-                                onChanged: eventStore.setNomeEvent,
-                                enabled: !eventStore.loading,
-                              );
-                            }),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: <Widget>[
-                                Expanded(
-                                  child: DateTimeField(
-                                    format: widget.dateFormat,
-                                    onChanged: (value){
-                                      eventStore.setDateEvent(value);
-                                    },
-                                    validator: (value){
-                                      if(eventStore.isDateValid){
-                                        return null;
-                                      }
-                                      return "Campo Data é Obrigatório!";
-                                    },
-                                    cursorColor: Colors.white60,
-                                    decoration: InputDecoration(
-                                      hintText: 'Data',
-                                      hintStyle: TextStyle(color: Colors.white60),
-                                    ),
-                                    onShowPicker: (context, currentValue) {
-                                      return showDatePicker(
-                                          context: context,
-                                          firstDate: DateTime(1990),
-                                          initialDate: currentValue ?? DateTime.now(),
-                                          lastDate: DateTime(2100));
-                                    },
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        )),
-                  )
                 ],
               ),
             ),
@@ -142,6 +102,76 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: <Widget>[
+                      SizedBox(height: 15),
+                      Form(
+                        key: _formKey,
+                        child: Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                DropdownButtonFormField(
+                                  items: listDrop,
+                                  hint: Text("Escolha um(a) Filho(a)"),
+                                  onChanged: (value) => eventStore.setIdFilhoEvent("$value"),
+                                  validator: (value){
+                                    if(eventStore.isIdFilhoValid){
+                                      return null;
+                                    }
+                                    return "Selecione um(a) Filho(a) ";
+                                  },
+                                ),
+                                SizedBox(height: 15),
+                                Observer(builder: (_){
+                                  return TextFormField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      icon: Icon(Icons.title),
+                                      hintText: 'Título',
+                                    ),
+                                    validator: (value){
+                                      if(eventStore.isNomeValid){
+                                        return null;
+                                      }
+                                      return "Campo Título é Obrigatório";
+                                    },
+                                    onChanged: eventStore.setNomeEvent,
+                                    enabled: !eventStore.loading,
+                                  );
+                                }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: DateTimeField(
+                                        format: widget.dateFormat,
+                                        onChanged: (value){
+                                          eventStore.setDateEvent(value);
+                                        },
+                                        validator: (value){
+                                          if(eventStore.isDateValid){
+                                            return null;
+                                          }
+                                          return "Campo Data é Obrigatório!";
+                                        },
+                                        cursorColor: Colors.white60,
+                                        decoration: InputDecoration(
+                                          hintText: 'Data',
+                                        ),
+                                        onShowPicker: (context, currentValue) {
+                                          return showDatePicker(
+                                              context: context,
+                                              firstDate: DateTime(1990),
+                                              initialDate: currentValue ?? DateTime.now(),
+                                              lastDate: DateTime(2100));
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            )),
+                      ),
                       DateTimeField(
                         controller: _horarioController,
                         onChanged: (value){
@@ -261,7 +291,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
                           eventData.horarioEvent = eventStore.horarioEvent;
                           eventData.descriptionEvent = eventStore.descricaoEvent;
                           eventData.typeEvent = eventStore.tipoEvent;
-                          eventData.cid = cid;
+                          eventData.cid = eventStore.idFilhoEvent;
 
                           bool result = false;
                           result = await eventStore.addEventData(eventData,

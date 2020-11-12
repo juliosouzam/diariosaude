@@ -1,3 +1,4 @@
+import 'package:diariosaude/media/media_query.dart';
 import 'package:flutter/material.dart';
 import 'package:diariosaude/themes/colors/theme_colors.dart';
 
@@ -17,8 +18,8 @@ class TopContainer extends StatelessWidget {
       decoration: BoxDecoration(
           color: ThemeColors.primary,
           borderRadius: BorderRadius.only(
-            bottomRight: Radius.circular(40.0),
-            bottomLeft: Radius.circular(40.0),
+            bottomRight: Radius.circular(SizeConfig.of(context).dynamicScaleSize(size: 40)),
+            bottomLeft: Radius.circular(SizeConfig.of(context).dynamicScaleSize(size: 40)),
           )),
       height: height,
       width: width,

@@ -40,6 +40,8 @@ abstract class _ChildStoreBase with Store {
   @observable
   ObservableList<ChildData> listChild = ObservableList<ChildData>();
 
+  bool childChange = true;
+
   @computed
   bool get isFormValid =>
       name != null &&
@@ -76,7 +78,9 @@ abstract class _ChildStoreBase with Store {
           .collection("users")
           .document(parentId)
           .collection("children")
-          .add(data.toMap());
+          .add(data.toMap()).then((value){
+            childChange=true;
+      });
 
 
       name = "";
@@ -96,12 +100,17 @@ abstract class _ChildStoreBase with Store {
   }
 
   Future getChildren(String uId) async {
-    QuerySnapshot query = await Firestore.instance
-        .collection("users")
-        .document(uId)
-        .collection("children")
-        .getDocuments();
-    listChild = query.documents.map((doc) => ChildData.fromDocument(doc)).toList().asObservable();
+    if(childChange){
+      QuerySnapshot query = await Firestore.instance
+          .collection("users")
+          .document(uId)
+          .collection("children")
+          .getDocuments().then((value) {
+            childChange = false;
+            return value;
+      });
+      listChild = query.documents.map((doc) => ChildData.fromDocument(doc)).toList().asObservable();
+    }
   }
 
   ChildData getChild(String cId) {
@@ -126,6 +135,8 @@ abstract class _ChildStoreBase with Store {
       FirebaseStorage.instance
           .getReferenceFromUrl(urlOld).then((ref){
         ref.delete();
+      }).then((value){
+        childChange = true;
       }).catchError((e){
         print(e);
       });
@@ -145,7 +156,9 @@ abstract class _ChildStoreBase with Store {
           .document(parentId)
           .collection("children")
           .document(cId)
-          .updateData(data.toMap());
+          .updateData(data.toMap()).then((value){
+            childChange = true;
+      });
 
       name = "";
       dateBirth = null;
@@ -178,7 +191,9 @@ abstract class _ChildStoreBase with Store {
           .document(parentId)
           .collection("children")
           .document(cId)
-          .delete();
+          .delete().then((value){
+            childChange = true;
+      });
       name = "";
       dateBirth = null;
       hourBirth = null;
